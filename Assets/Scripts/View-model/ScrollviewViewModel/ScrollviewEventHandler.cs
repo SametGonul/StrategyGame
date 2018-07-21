@@ -1,51 +1,52 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using Assets.Scripts.Models;
-using Assets.Scripts.ScrollviewViewModel;
-using Assets.Scripts.View;
-using Assets.Scripts.View.scrollview;
-using UnityEngine;
-using UnityEngine.SceneManagement;
-using Assets.Scripts.StrategyGame.conf;
-using GameObject = UnityEngine.GameObject;
+﻿using UnityEngine;
 
-public class ScrollviewEventHandler : MonoBehaviour
+
+namespace Assets.Scripts.ScrollviewViewModel
 {
+    /// <summary>
+    /// this class detects events for scrollview.
+    /// </summary>
 
-    private float MouseStartYPosition;
+    public class ScrollviewEventHandler : MonoBehaviour
+    {
 
-    private ScrollviewController _scrollviewController;
-	// Use this for initialization
-	void Start ()
-	{
-	    _scrollviewController = new ScrollviewController();
-        //Debug.Log(BuildingsList.Count());
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	  
-    }
+        private float MouseStartYPosition; // first mouse input position on scrollview
 
-    public void OnDragStart()
-    {  
-        MouseStartYPosition = Input.mousePosition.y;  
-        //Debug.Log("scrollview drag started.");
-    }
-
-    public void OnDragMause()
-    {  
-        float yPositionDifference = Input.mousePosition.y - MouseStartYPosition ;
-        //Debug.Log(yPositionDifference);
-        if (yPositionDifference != 0)
+        private ScrollviewController _scrollviewController;
+        // Use this for initialization
+        void Start ()
         {
-            _scrollviewController.MoveBuildings(yPositionDifference);
+            _scrollviewController = ScrollviewController.Instance(); // it uses singleton singleviewcontroller.
+            //Debug.Log(BuildingsList.Count());
         }
+	
+        // Update is called once per frame
+        void Update () {
+	  
+        }
+
+        // This detects drag starts on scrollview not barrack and powerplant
+        // assign yposition float to y position of starting input point
+        public void OnDragStart()
+        {  
+            MouseStartYPosition = Input.mousePosition.y;  
+            //Debug.Log("scrollview drag started.");
+        }
+
+        //while mouse input changing, it calculates difference on y direction and if it is changing (!=0) call scrollviewcontroller
+        // move buildings functions.
+        public void OnDragMause()
+        {  
+            float yPositionDifference = Input.mousePosition.y - MouseStartYPosition ;
+            //Debug.Log(yPositionDifference);
+            if (yPositionDifference != 0)
+            {
+                _scrollviewController.MoveBuildings(yPositionDifference);
+            }
         
-    }
+        }
 
     
 
+    }
 }

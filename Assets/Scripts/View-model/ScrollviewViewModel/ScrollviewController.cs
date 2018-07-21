@@ -8,17 +8,22 @@ using UnityEngine.XR.WSA.Persistence;
 
 namespace Assets.Scripts.ScrollviewViewModel
 {
+    /// <summary>
+    /// this is singleton class for scrollview. one of the main controller in this game
+    /// </summary>
+   
     public class ScrollviewController
     {
-        private List<ScrollviewBuildingController> _buildingControllers = new List<ScrollviewBuildingController>();
-        public static ScrollviewController instance = null;
+        // keep building controller for every building
+        private List<ScrollviewBuildingController> _buildingControllers = new List<ScrollviewBuildingController>();  
+        public static ScrollviewController instance = null; // singleton instance
 
-        public ScrollviewController()
+        private ScrollviewController()
         {
-
-            AddScrollviewBuildingControllers();
+            AddScrollviewBuildingControllers(); // singleton constructor, calling this function to add all building controllers
         }
 
+        // creating instance
         public static ScrollviewController Instance()
         {
             if (instance == null)
@@ -31,6 +36,7 @@ namespace Assets.Scripts.ScrollviewViewModel
 
         // Use this for initialization
         
+        //
         public void MoveBuildings(float difference)
         {
             int Speed = 500;

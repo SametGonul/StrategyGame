@@ -6,6 +6,10 @@ using Assets.Scripts.StrategyGame.conf;
 
 namespace Assets.Scripts.Models
 {
+
+    /// <summary>
+    /// Barrack model class, these get methods returns it's contstant values.
+    /// </summary>
     public class BarrackModel : IBuilding
     {
         public string Name

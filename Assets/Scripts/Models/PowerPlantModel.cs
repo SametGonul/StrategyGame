@@ -7,6 +7,10 @@ using JetBrains.Annotations;
 
 namespace Assets.Scripts.Models
 {
+    /// <summary>
+    /// This powerplant model inherited from building interfaces
+    /// These get methods return their contstant values
+    /// </summary>
     public class PowerPlantModel : IBuilding
     {
         public string Name

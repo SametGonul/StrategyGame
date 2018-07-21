@@ -5,6 +5,10 @@ using UnityEngine;
 
 namespace Assets.Scripts.StrategyGame.conf
 {
+
+    /// <summary>
+    /// This class for constant values in the game.
+    /// </summary>
     public class Config : MonoBehaviour
     {
         // Infinite Scrollview Constants
@@ -13,7 +17,7 @@ namespace Assets.Scripts.StrategyGame.conf
         public const int ScrollviewMaxYValue = 500;
 
         public const int ObjectPoolConstant = 1000;
-        // Buildings Constants
+       
         // barrack constants
         public const int BarrackHorizontalSize = 3;
         public const int BarrackVerticalSize = 3;

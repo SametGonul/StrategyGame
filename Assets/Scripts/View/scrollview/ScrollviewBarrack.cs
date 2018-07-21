@@ -7,6 +7,9 @@ using Assets.Scripts.StrategyGame.conf;
 
 namespace Assets.Scripts.View.scrollview
 {
+    /// <summary>
+    /// View class for barracks
+    /// </summary>
     public class ScrollviewBarrack : ScrollBuildingView
     {
 

@@ -7,6 +7,10 @@ using UnityEngine;
 
 namespace Assets.Scripts.View.scrollview
 {
+
+    /// <summary>
+    /// View class for powerplants.
+    /// </summary>
     public class ScrollviewPowerPlant : ScrollBuildingView
     {
 

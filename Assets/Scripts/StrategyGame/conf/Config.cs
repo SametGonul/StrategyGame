@@ -16,7 +16,7 @@ namespace Assets.Scripts.StrategyGame.conf
         public const int ScrollviewMinYValue = -500;
         public const int ScrollviewMaxYValue = 500;
 
-        public const int ObjectPoolConstant = 1000;
+        public const int ScrollviewHeight = 1000;
        
         // barrack constants
         public const int BarrackHorizontalSize = 3;

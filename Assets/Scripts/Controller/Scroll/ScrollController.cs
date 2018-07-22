@@ -1,34 +1,31 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using Assets.Scripts.View.scrollview;
-using UnityEditor;
+using Assets.Scripts.View.scroll;
 using UnityEngine;
-using UnityEngine.XR.WSA.Persistence;
 
-namespace Assets.Scripts.ScrollviewViewModel
+namespace Assets.Scripts.Controller.Scroll
 {
     /// <summary>
     /// this is singleton class for scrollview. one of the main controller in this game
     /// </summary>
    
-    public class ScrollviewController
+    public class ScrollController
     {
         // keep building controller for every building
-        private List<ScrollviewBuildingController> _buildingControllers = new List<ScrollviewBuildingController>();  
-        public static ScrollviewController instance = null; // singleton instance
+        private List<ScrollBuildingController> _buildingControllers = new List<ScrollBuildingController>();  
+        public static ScrollController instance = null; // singleton instance
 
-        private ScrollviewController()
+        private ScrollController()
         {
             AddScrollviewBuildingControllers(); // singleton constructor, calling this function to add all building controllers
         }
 
         // creating instance
-        public static ScrollviewController Instance()
+        public static ScrollController Instance()
         {
             if (instance == null)
             {
-                instance = new ScrollviewController();
+                instance = new ScrollController();
             }
             return instance;        
         }
@@ -65,8 +62,8 @@ namespace Assets.Scripts.ScrollviewViewModel
             IEnumerable<ScrollBuildingView> buildingList = GameObject.FindObjectsOfType<MonoBehaviour>().OfType<ScrollBuildingView>();
             for (int i = 0; i < buildingList.Count(); i++)
             {
-                ScrollviewBuildingController _scrollviewBuildingController = new ScrollviewBuildingController(buildingList.ElementAt(i));
-                _buildingControllers.Add(_scrollviewBuildingController);
+                ScrollBuildingController scrollBuildingController = new ScrollBuildingController(buildingList.ElementAt(i));
+                _buildingControllers.Add(scrollBuildingController);
             }
         }
     }

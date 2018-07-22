@@ -1,11 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using Assets.Scripts.ScrollviewViewModel;
-using Assets.Scripts.StrategyGame.conf;
-using Assets.Scripts.View;
+﻿using Assets.Scripts.Controller.Scroll;
 using UnityEngine;
 
-namespace Assets.Scripts.View.scrollview
+namespace Assets.Scripts.View.scroll
 {
     /// <summary>
     /// this is parent class for barrack and power plant, it is inherited from view interface class.
@@ -17,7 +13,7 @@ namespace Assets.Scripts.View.scrollview
         public GameObject BuildingObject;  
 
         // this parent has viewmodel and getter and setter methods.
-        public ScrollviewBuildingController ScrollviewBuildingController { get; set; } 
+        public ScrollBuildingController ScrollBuildingController { get; set; } 
 
         GameObject IScrollBuildingView.buildingObject
         {
@@ -31,7 +27,7 @@ namespace Assets.Scripts.View.scrollview
         // to check relocation with object pooling, it calls that functions from controller.
         void Update()
         {
-            ScrollviewBuildingController.RelocateBuilding();
+            ScrollBuildingController.RelocateBuilding();
         }
     }
 

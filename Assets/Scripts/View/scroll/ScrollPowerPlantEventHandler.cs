@@ -1,13 +1,13 @@
 ﻿using UnityEngine;
 
-namespace Assets.Scripts.ScrollviewViewModel
+namespace Assets.Scripts.View.scroll
 {
 
     /// <summary>
     /// this class to detect events for powerplants
     /// </summary>
   
-    public class ScrollviewPowerPlantEventHandler : MonoBehaviour {
+    public class ScrollPowerPlantEventHandler : MonoBehaviour {
 
         // Use this for initialization
         void Start () {

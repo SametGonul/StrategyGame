@@ -1,15 +1,11 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using JetBrains.Annotations;
-using UnityEngine;
-using Assets.Scripts.StrategyGame.conf;
+﻿using Assets.Scripts.StrategyGame.conf;
 
-namespace Assets.Scripts.Models
+namespace Assets.Scripts.Model
 {
 
 
     /// <summary> it is abstract building factory class </summary> 
-    public class BuildingFactory : IBuilding
+    public class ScrollBuildingModelFactory : IScrollBuildingModel
     {
 
         // implementation of class members
@@ -18,14 +14,14 @@ namespace Assets.Scripts.Models
         public int HorizontalSize { get; private set; }
 
         // factory function,according to name it creates model. 
-        public IBuilding CreateBuilding(string name)
+        public IScrollBuildingModel CreateBuilding(string name)
         {
             switch (name)
             {
                 case Config.BarrackName:
-                    return new BarrackModel();
+                    return new ScrollBarrackModel();
                 case Config.PowerPlantName:
-                    return new PowerPlantModel();
+                    return new ScrollPowerPlantModel();
                 default:
                     return null;
             }

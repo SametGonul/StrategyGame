@@ -1,17 +1,12 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
-using Assets.Scripts.StrategyGame.conf;
-using JetBrains.Annotations;
+﻿using Assets.Scripts.StrategyGame.conf;
 
-namespace Assets.Scripts.Models
+namespace Assets.Scripts.Model
 {
     /// <summary>
     /// This powerplant model inherited from building interfaces
     /// These get methods return their contstant values
     /// </summary>
-    public class PowerPlantModel : IBuilding
+    public class ScrollPowerPlantModel : IScrollBuildingModel
     {
         public string Name
         {

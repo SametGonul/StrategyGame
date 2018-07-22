@@ -1,17 +1,11 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.XR.WSA.Persistence;
-
-
-namespace Assets.Scripts.Models
+﻿namespace Assets.Scripts.Model
 {
 
     /// <summary>
     /// It is an interface for buildings
     /// it includes name,vertical size,horizotnal size.
     /// </summary>
-    public interface IBuilding
+    public interface IScrollBuildingModel
     {
         string Name { get; }
         int VerticalSize { get; }

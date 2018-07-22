@@ -1,12 +1,12 @@
 ﻿using UnityEngine;
 
-namespace Assets.Scripts.ScrollviewViewModel
+namespace Assets.Scripts.View.scroll
 {
     /// <summary>
     /// this class' purpose is to check events start and continuous from barrack.
     /// </summary>
  
-    public class ScrollviewBarrackEventHandler : MonoBehaviour {
+    public class ScrollBarrackEventHandler : MonoBehaviour {
 
         // Use this for initialization
         void Start () {

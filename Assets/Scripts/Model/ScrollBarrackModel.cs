@@ -1,16 +1,12 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
-using Assets.Scripts.StrategyGame.conf;
+﻿using Assets.Scripts.StrategyGame.conf;
 
-namespace Assets.Scripts.Models
+namespace Assets.Scripts.Model
 {
 
     /// <summary>
     /// Barrack model class, these get methods returns it's contstant values.
     /// </summary>
-    public class BarrackModel : IBuilding
+    public class ScrollBarrackModel : IScrollBuildingModel
     {
         public string Name
         {

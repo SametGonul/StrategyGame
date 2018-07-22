@@ -1,22 +1,22 @@
-﻿using UnityEngine;
+﻿using Assets.Scripts.Controller.Scroll;
+using UnityEngine;
 
-
-namespace Assets.Scripts.ScrollviewViewModel
+namespace Assets.Scripts.View.scroll
 {
     /// <summary>
     /// this class detects events for scrollview.
     /// </summary>
 
-    public class ScrollviewEventHandler : MonoBehaviour
+    public class ScrollEventHandler : MonoBehaviour
     {
 
         private float MouseStartYPosition; // first mouse input position on scrollview
 
-        private ScrollviewController _scrollviewController;
+        private ScrollController _scrollController;
         // Use this for initialization
         void Start ()
         {
-            _scrollviewController = ScrollviewController.Instance(); // it uses singleton singleviewcontroller.
+            _scrollController = ScrollController.Instance(); // it uses singleton singleviewcontroller.
             //Debug.Log(BuildingsList.Count());
         }
 	
@@ -41,7 +41,7 @@ namespace Assets.Scripts.ScrollviewViewModel
             //Debug.Log(yPositionDifference);
             if (yPositionDifference != 0)
             {
-                _scrollviewController.MoveBuildings(yPositionDifference);
+                _scrollController.MoveBuildings(yPositionDifference);
             }
         
         }

@@ -2,21 +2,19 @@
 
 namespace Assets.Scripts.Model
 {
-
-
+    public abstract class BuildingFactory
+    {
+        public abstract IScrollBuildingModel CreateScrollBuildingModel(string buildingName);
+    }
     /// <summary> it is abstract building factory class </summary> 
-    public class ScrollBuildingModelFactory : IScrollBuildingModel
+    public class ScrollBuildingModelFactory : BuildingFactory
     {
 
-        // implementation of class members
-        public string Name { get; private set; }
-        public int VerticalSize { get; private set; }
-        public int HorizontalSize { get; private set; }
-
         // factory function,according to name it creates model. 
-        public IScrollBuildingModel CreateBuilding(string name)
+
+        public override IScrollBuildingModel CreateScrollBuildingModel(string buildingName)
         {
-            switch (name)
+            switch (buildingName)
             {
                 case Config.BarrackName:
                     return new ScrollBarrackModel();
@@ -26,6 +24,5 @@ namespace Assets.Scripts.Model
                     return null;
             }
         }
-
     }
 }

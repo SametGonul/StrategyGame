@@ -1,4 +1,5 @@
 ﻿using Assets.Scripts.StrategyGame.conf;
+using UnityEngine;
 
 namespace Assets.Scripts.Model
 {
@@ -8,6 +9,7 @@ namespace Assets.Scripts.Model
     /// </summary>
     public class ScrollBarrackModel : IScrollBuildingModel
     {
+        
         public string Name
         {
             get { return Config.BarrackName; }
@@ -23,7 +25,9 @@ namespace Assets.Scripts.Model
             get { return Config.BarrackHorizontalSize; }
         }
 
-      
+        public int XIndex { get; set; }
+        public int YIndex { get; set; }
+        public int BuildingNumber { get; set; }
     }
 
 }

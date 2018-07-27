@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using Assets.Scripts.Controller.Map;
+using Assets.Scripts.Controller.Scroll;
+using UnityEngine;
 
 namespace Assets.Scripts.View.scroll
 {
@@ -10,7 +12,7 @@ namespace Assets.Scripts.View.scroll
 
         // Use this for initialization
         void Start () {
-		
+		    
         }
 	
         // Update is called once per frame
@@ -20,13 +22,20 @@ namespace Assets.Scripts.View.scroll
         // TO DO: this function will detect drag will be started in barrack.
         public void BarrackDragStart()
         {
-            //Debug.Log("Barrack drag start.");
+            ScrollController.Instance().BarrackEventChecker = true;
         }
 
         // TO DO: this function will detect if drag continuous on map and help to build barrack on map.
         public void BarrackDragOn()
         {
             //Debug.Log("Barrack dragging on.");
+        }
+
+        public void BarrackDragFinish()
+        {
+            if (MapController.Instance().GetMouseEventChecker())
+                MapController.Instance().DragFinished();
+            ScrollController.Instance().BarrackEventChecker = false;
         }
     }
 }

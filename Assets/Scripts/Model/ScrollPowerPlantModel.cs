@@ -1,4 +1,5 @@
 ﻿using Assets.Scripts.StrategyGame.conf;
+using UnityEngine;
 
 namespace Assets.Scripts.Model
 {
@@ -22,8 +23,12 @@ namespace Assets.Scripts.Model
         {
             get { return Config.PowerPlantHorizontalSize; }
         }
-   
 
+        public int XIndex { get; set; }
+        public int YIndex { get; set; }
+        public int BuildingNumber { get; set; }
+
+        public Vector2 LocationCenter { get; set; }
     }
 
 }

@@ -1,4 +1,7 @@
-﻿namespace Assets.Scripts.Model
+﻿using UnityEngine;
+using UnityEngine.XR.WSA.Persistence;
+
+namespace Assets.Scripts.Model
 {
 
     /// <summary>
@@ -10,7 +13,9 @@
         string Name { get; }
         int VerticalSize { get; }
         int HorizontalSize { get; }
-        
+        int XIndex { get; set; }
+        int YIndex { get; set; }
+        int BuildingNumber { get; set; }
     }
 }
 

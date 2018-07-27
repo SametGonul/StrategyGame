@@ -13,7 +13,10 @@ namespace Assets.Scripts.Controller.Scroll
     {
         // keep building controller for every building
         private List<ScrollBuildingController> _buildingControllers = new List<ScrollBuildingController>();  
-        public static ScrollController instance = null; // singleton instance
+        private static ScrollController instance = null; // singleton instance
+
+        public bool BarrackEventChecker = false;
+        public bool PowerPlantEventChecker = false;
 
         private ScrollController()
         {
@@ -23,11 +26,7 @@ namespace Assets.Scripts.Controller.Scroll
         // creating instance
         public static ScrollController Instance()
         {
-            if (instance == null)
-            {
-                instance = new ScrollController();
-            }
-            return instance;        
+            return instance ?? (instance = new ScrollController());
         }
         
 

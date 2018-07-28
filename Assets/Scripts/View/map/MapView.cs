@@ -10,21 +10,24 @@ namespace Assets.Scripts.View.map
     {
 
         // Grid prefab for every grid.
-        public GameObject GridPrefab; 
+        public GameObject GridPrefab;
+        public GameObject SoldierPrefab;
 
+        private GameObject[,] _gridCellGameArray;
         // Use this for initialization
         void Start () {
-		
+            _gridCellGameArray = new GameObject[Config.VerticalGridNumber, Config.HorizontalGridNumber];
         }
 	
         // Update is called once per frame
         void Update () {
 		    MapController.Instance().FindTheCell();
+            MapController.Instance().Move();
         }
 
         public GameObject[,] LocateGrids()
         {
-            GameObject[,] _gridCellGameArray = new GameObject[Config.VerticalGridNumber,Config.HorizontalGridNumber];
+             
             float StartingX = Config.FirstGridStartingXCoordinate;
             float StartingY = Config.FirstGridStartingYCoordinate;
 
@@ -45,6 +48,13 @@ namespace Assets.Scripts.View.map
             }
 
             return _gridCellGameArray;
+        }
+
+        public GameObject CreateSoldierObject(int xIndex,int yIndex)
+        {
+            GameObject soldier = Instantiate(SoldierPrefab,transform);
+            soldier.transform.localPosition = _gridCellGameArray[xIndex, yIndex].transform.localPosition;
+            return soldier;
         }
 
     }

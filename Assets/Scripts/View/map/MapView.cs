@@ -22,39 +22,28 @@ namespace Assets.Scripts.View.map
         // Update is called once per frame
         void Update () {
 		    MapController.Instance().FindTheCell();
-            MapController.Instance().Move();
         }
 
         public GameObject[,] LocateGrids()
         {
              
-            float StartingX = Config.FirstGridStartingXCoordinate;
-            float StartingY = Config.FirstGridStartingYCoordinate;
+            float startingX = Config.FirstGridStartingXCoordinate;
+            float startingY = Config.FirstGridStartingYCoordinate;
 
             for (int i = 0; i < Config.VerticalGridNumber; i++)
             {
                 for (int j = 0; j < Config.HorizontalGridNumber; j++)
                 {
                     GameObject newObject = Instantiate(GridPrefab, transform);
-                    newObject.transform.localPosition = new Vector2(StartingX, StartingY);
-                    StartingX += Config.GridSize;
-
+                    newObject.transform.localPosition = new Vector2(startingX, startingY);
+                    startingX += Config.GridSize;
                     _gridCellGameArray[i, j] =  newObject;
-                    //Debug.Log(MapController.Instance()._gridCellArray[i,j]);
-
                 }
-                StartingX = Config.FirstGridStartingXCoordinate;
-                StartingY -= Config.GridSize;
+                startingX = Config.FirstGridStartingXCoordinate;
+                startingY -= Config.GridSize;
             }
 
             return _gridCellGameArray;
-        }
-
-        public GameObject CreateSoldierObject(int xIndex,int yIndex)
-        {
-            GameObject soldier = Instantiate(SoldierPrefab,transform);
-            soldier.transform.localPosition = _gridCellGameArray[xIndex, yIndex].transform.localPosition;
-            return soldier;
         }
 
     }

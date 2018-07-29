@@ -10,7 +10,6 @@ using Assets.Scripts.View.map;
 using Unity.Jobs;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.Networking;
 using UnityEngine.UI;
 using Object = UnityEngine.Object;
 
@@ -42,17 +41,24 @@ namespace Assets.Scripts.Controller.Map
         private List<GameObject> soldiersList = new List<GameObject>();
         private bool _soldierClickedChecker = false;
 
-        private int? _soldierXIndex = null;
-        private int? _soldierYIndex = null;
-        private int? _moveFinishXIndex = null;
-        private int? _moveFinishYIndex = null;
-        private int? _soldierIndexInList = null;
-
+        private List<List<int>> exPath = new List<List<int>>();
         private MapController()
         {
             MapView exMapView = Object.FindObjectOfType<MapView>();
             _gridCellGameObjectArray = exMapView.LocateGrids();
             _gridCellArray = GridController.Instance().GetGridCellArray();
+            exPath.Add(new List<int>{3,2});
+            exPath.Add(new List<int> { 4, 2 });
+            exPath.Add(new List<int> { 5, 2 });
+            exPath.Add(new List<int> { 5, 3 });
+            exPath.Add(new List<int> { 6, 3 });
+            exPath.Add(new List<int> { 7, 3 });
+            exPath.Add(new List<int> { 8, 3 });
+            exPath.Add(new List<int> { 8, 4 });
+            exPath.Add(new List<int> { 8, 5 });
+            exPath.Add(new List<int> { 8, 6 });
+            exPath.Add(new List<int> { 9, 6 });
+
         }
 
         public static MapController Instance()
@@ -400,10 +406,18 @@ namespace Assets.Scripts.Controller.Map
             {
                 if (_gridCellArray[clickedXIndex, clickedYIndex].GridCellType == GridCellTypes.Soldier)
                 {
-                    _soldierXIndex = clickedXIndex; 
-                    _soldierYIndex = clickedYIndex;
+                    foreach (var soldier in soldiersList)
+                    {
+                        if (soldier.transform.position ==
+                            _gridCellGameObjectArray[clickedXIndex, clickedYIndex].transform.position)
+                        {
+                            soldier.GetComponent<SoldierView>().GetSoldierController().SetSoldierXIndex(clickedXIndex);
+                            soldier.GetComponent<SoldierView>().GetSoldierController().SetSoldierYIndex(clickedYIndex);
+                            soldier.GetComponent<SoldierView>().GetSoldierController().SetSoldierSelected(true);
+                        }
+                    }
+
                     _soldierClickedChecker = true;
-                    Debug.Log(_soldierClickedChecker);
                 }
                 else
                 {
@@ -413,14 +427,22 @@ namespace Assets.Scripts.Controller.Map
 
             if (mouseClickType == 1)
             {
-                Debug.Log(_soldierClickedChecker);
                 if (_gridCellArray[clickedXIndex, clickedYIndex].GridCellType == GridCellTypes.Empty &&
                     _soldierClickedChecker)
                 {
-                    _moveFinishXIndex = clickedXIndex;
-                    _moveFinishYIndex = clickedYIndex;
-
-                    DetermineTheSoldierIndex((int)_soldierXIndex,(int)_soldierYIndex);
+                    //_moveFinishXIndex = clickedXIndex;
+                    //_moveFinishYIndex = clickedYIndex;   
+                    foreach (var soldier in soldiersList)
+                    {
+                        if (soldier.GetComponent<SoldierView>().GetSoldierController().GetSoldierSelected() == true)
+                        {
+                            if (soldier.GetComponent<SoldierView>().GetSoldierController().GetSoldierMoving() == false)
+                            {
+                                soldier.GetComponent<SoldierView>().GetSoldierController().SetSoldierMovingXIndex(exPath[1][0]);
+                                soldier.GetComponent<SoldierView>().GetSoldierController().SetSoldierMovingYIndex(exPath[1][1]);
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -523,46 +545,24 @@ namespace Assets.Scripts.Controller.Map
         {
             _gridCellArray[xIndex, yIndex].GridCellType = GridCellTypes.Soldier;
             MapView exMapView = Object.FindObjectOfType<MapView>();
-            GameObject Soldier = exMapView.CreateSoldierObject(xIndex, yIndex);
-            soldiersList.Add(Soldier);
+            GameObject soldier = Object.Instantiate(exMapView.SoldierPrefab, exMapView.transform);
+            soldier.transform.localPosition = _gridCellGameObjectArray[xIndex, yIndex].transform.localPosition;
+            soldiersList.Add(soldier);
         }
 
-        private void DetermineTheSoldierIndex(int startXIndex, int startYIndex)
+        public GameObject[,] GetObjectList()
         {
-
-            for (int i = 0; i < soldiersList.Count; i++)
-            {
-                if (_gridCellGameObjectArray[startXIndex, startYIndex].transform.localPosition ==
-                    soldiersList[i].transform.localPosition)
-                {
-                    _soldierIndexInList = i;
-                }
-            }
+            return _gridCellGameObjectArray;
         }
 
-        public void Move()
+        public List<List<int>> GetExamplePath()
         {
+            return exPath;
+        }
 
-            if (_soldierXIndex != null && _soldierYIndex != null && _moveFinishXIndex != null &&
-                _moveFinishYIndex != null)
-            {
-                soldiersList[(int) _soldierIndexInList].transform.localPosition = new Vector2(soldiersList[(int)_soldierIndexInList].transform.localPosition.x, soldiersList[(int)_soldierIndexInList].transform.localPosition.y - 200*Time.deltaTime);
-                if (soldiersList[(int) _soldierIndexInList].transform.localPosition.y <
-                    _gridCellGameObjectArray[(int) _moveFinishXIndex, (int) _moveFinishYIndex].transform.localPosition
-                        .y)
-                {
-                    soldiersList[(int) _soldierIndexInList].transform.localPosition =
-                        _gridCellGameObjectArray[(int) _moveFinishXIndex, (int) _moveFinishYIndex].transform
-                            .localPosition;
-                    _gridCellArray[(int)this._soldierXIndex, (int) _soldierYIndex].GridCellType = GridCellTypes.Empty;
-                    _gridCellArray[(int) _moveFinishXIndex, (int) _moveFinishYIndex].GridCellType =
-                        GridCellTypes.Soldier;
-                    _soldierXIndex = _moveFinishXIndex;
-                    _soldierYIndex = _moveFinishYIndex;
-                    _moveFinishXIndex = null;
-
-                }
-            }
+        public IGridCellModel[,] GetGridCellArray()
+        {
+            return _gridCellArray;
         }
     }
 }

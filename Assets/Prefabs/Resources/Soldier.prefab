@@ -20,8 +20,8 @@ GameObject:
   m_Component:
   - component: {fileID: 224500985741653388}
   - component: {fileID: 222136010988596870}
+  - component: {fileID: 114469374180051238}
   - component: {fileID: 114916077220133062}
-  - component: {fileID: 114987685559498100}
   m_Layer: 5
   m_Name: Soldier
   m_TagString: Untagged
@@ -29,6 +29,19 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &114469374180051238
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1004959213218436}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b174b80e4636db748b28d9c2e544ee15, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SoldierPrefab: {fileID: 1004959213218436}
+  SoldierSelected: 0
 --- !u!114 &114916077220133062
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -56,18 +69,6 @@ MonoBehaviour:
   m_FillAmount: 1
   m_FillClockwise: 1
   m_FillOrigin: 0
---- !u!114 &114987685559498100
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1004959213218436}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b174b80e4636db748b28d9c2e544ee15, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  SoldierPrefab: {fileID: 1004959213218436}
 --- !u!222 &222136010988596870
 CanvasRenderer:
   m_ObjectHideFlags: 1

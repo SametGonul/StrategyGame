@@ -29,6 +29,8 @@ namespace Assets.Scripts.Controller.Map
                 {
                     GridModel GridCell = new GridModel();
                     GridCellArray[i, j] = GridCell;
+                    GridCellArray[i, j].XIndex = i;
+                    GridCellArray[i, j].YIndex = j;
                 }             
             }       
         }

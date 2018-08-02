@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
 using Assets.Scripts.Controller.Info;
 using Assets.Scripts.Controller.Scroll;
@@ -9,8 +10,10 @@ using Assets.Scripts.StrategyGame.conf;
 using Assets.Scripts.View.map;
 using Unity.Jobs;
 using UnityEditor;
+using UnityEditor.Experimental.UIElements.GraphView;
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.Experimental.UIElements;
+using Image = UnityEngine.UI.Image;
 using Object = UnityEngine.Object;
 
 namespace Assets.Scripts.Controller.Map
@@ -32,7 +35,7 @@ namespace Assets.Scripts.Controller.Map
 
         private bool _barrackCollisionChecker = false;
         private bool _powerPlantCollisionChecker = false;
-
+        private bool _soldierChecker = false;
         private int _barrackCounter = 1;
 
         private int _powerPlantCounter = 1;
@@ -41,24 +44,14 @@ namespace Assets.Scripts.Controller.Map
         private List<GameObject> soldiersList = new List<GameObject>();
         private bool _soldierClickedChecker = false;
 
-        private List<List<int>> exPath = new List<List<int>>();
+        private List<GridModel> exPath = new List<GridModel>();
+        CellModelForAStar[,] cellModelAStarArray = new CellModelForAStar[Config.VerticalGridNumber, Config.HorizontalGridNumber];
+
         private MapController()
         {
             MapView exMapView = Object.FindObjectOfType<MapView>();
             _gridCellGameObjectArray = exMapView.LocateGrids();
             _gridCellArray = GridController.Instance().GetGridCellArray();
-            exPath.Add(new List<int>{3,2});
-            exPath.Add(new List<int> { 4, 2 });
-            exPath.Add(new List<int> { 5, 2 });
-            exPath.Add(new List<int> { 5, 3 });
-            exPath.Add(new List<int> { 6, 3 });
-            exPath.Add(new List<int> { 7, 3 });
-            exPath.Add(new List<int> { 8, 3 });
-            exPath.Add(new List<int> { 8, 4 });
-            exPath.Add(new List<int> { 8, 5 });
-            exPath.Add(new List<int> { 8, 6 });
-            exPath.Add(new List<int> { 9, 6 });
-
         }
 
         public static MapController Instance()
@@ -73,9 +66,11 @@ namespace Assets.Scripts.Controller.Map
             BuildingFactory factory = new ScrollBuildingModelFactory();
             if (ScrollController.Instance().BarrackEventChecker)
             {
+                
                 ScrollController.Instance().BarrackEventChecker = false;
-                CheckCollidedBarraksOnDragFinish();          
-                if (!_barrackCollisionChecker)
+                CheckCollidedBarraksOnDragFinish();
+                CheckSoldierInBuildingArea(GridCellTypes.Barrack);
+                if (!_barrackCollisionChecker && !_soldierChecker)
                 {
                     IScrollBuildingModel barrack = factory.CreateScrollBuildingModel(Config.BarrackName);
                     if (_activeCellPositionX != null) barrack.XIndex = (int) _activeCellPositionX;
@@ -83,19 +78,22 @@ namespace Assets.Scripts.Controller.Map
                     barrack.BuildingNumber = _barrackCounter;
                     _barrackCounter++;
                     barracks.Add(barrack);
-                    LocateBarrackOnMap();                  
+                                  
                 }
                 else
                 {
                     _barrackCollisionChecker = false;
                 }
+
+                _soldierChecker = false;
             }
             
             else if (ScrollController.Instance().PowerPlantEventChecker)
             {        
                 ScrollController.Instance().PowerPlantEventChecker = false;
                 CheckCollidedPowerPlantsOnDragFinish();
-                if (!_powerPlantCollisionChecker)
+                CheckSoldierInBuildingArea(GridCellTypes.PowerPlant);
+                if (!_powerPlantCollisionChecker && !_soldierChecker)
                 {
                     IScrollBuildingModel powerPlant = factory.CreateScrollBuildingModel(Config.PowerPlantName);
                     if (_activeCellPositionX != null) powerPlant.XIndex = (int)_activeCellPositionX;
@@ -103,12 +101,13 @@ namespace Assets.Scripts.Controller.Map
                     powerPlant.BuildingNumber = _powerPlantCounter;
                     _powerPlantCounter++;
                     powerPlants.Add(powerPlant);
-                    LocatePowerPlantOnMap();
+                    CheckSoldierInBuildingArea(GridCellTypes.PowerPlant);
                 }
                 else
                 {
                     _powerPlantCollisionChecker = false;
                 }
+                _soldierChecker = false;
             }
             _activeCellPositionY = null;
             _activeCellPositionX = null;     
@@ -192,6 +191,7 @@ namespace Assets.Scripts.Controller.Map
                         {
                             _gridCellGameObjectArray[i, j].GetComponent<Image>().color = Color.red;
                         }
+                       
                     }
                 }
             }
@@ -216,30 +216,61 @@ namespace Assets.Scripts.Controller.Map
             }
         }
 
-        private void LocateBarrackOnMap()
+
+        private void CheckSoldierInBuildingArea(GridCellTypes GridCellType)
         {
-            for (int i = (int)_activeCellPositionX - 1; i <= (int)_activeCellPositionX + 1; i++)
+            int IndexSetterWithBuildingType;
+            if (GridCellType == GridCellTypes.Barrack)
+            {
+                IndexSetterWithBuildingType = 1;
+            }
+            else
+            {
+                IndexSetterWithBuildingType = 0;
+
+            }
+            
+            for (int i = (int)_activeCellPositionX - 1; i <= (int)_activeCellPositionX + IndexSetterWithBuildingType; i++)
             {
                 for (int j = (int)_activeCellPositionY - 1; j <= (int)_activeCellPositionY + 1; j++)
                 {
-                    if(_gridCellArray[i,j].GridCellType == GridCellTypes.Empty)
-                        _gridCellArray[i, j].GridCellType = GridCellTypes.Barrack;  
+                    if (_gridCellArray[i, j].GridCellType == GridCellTypes.Soldier)
+                        _soldierChecker = true;
                 }
             }
-        }
-
-        private void LocatePowerPlantOnMap()
-        {
-            for (int i = (int)_activeCellPositionX - 1; i <= (int)_activeCellPositionX ; i++)
+            if (_soldierChecker)
             {
-                for (int j = (int)_activeCellPositionY - 1; j <= (int)_activeCellPositionY + 1; j++)
+                for (int i = (int)_activeCellPositionX - 1; i <= (int)_activeCellPositionX + IndexSetterWithBuildingType; i++)
                 {
-                    if(_gridCellArray[i,j].GridCellType == GridCellTypes.Empty)
-                        _gridCellArray[i, j].GridCellType = GridCellTypes.PowerPlant;
+                    for (int j = (int)_activeCellPositionY - 1; j <= (int)_activeCellPositionY + 1; j++)
+                    {
+                        if (_gridCellArray[i, j].GridCellType != GridCellTypes.Soldier)
+                        {
+                            _gridCellArray[i, j].GridCellType = GridCellTypes.Empty;
+                            _gridCellGameObjectArray[i, j].GetComponent<Image>().color = Color.green;
+                        }
+                        else
+                        {
+                            _gridCellArray[i, j].GridCellType = GridCellTypes.Soldier;
+                            _gridCellGameObjectArray[i, j].GetComponent<Image>().color = Color.green;
+                        }
+                    }
+                }
+            }
+            
+            else
+            {
+                for (int i = (int)_activeCellPositionX - 1; i <= (int)_activeCellPositionX + IndexSetterWithBuildingType; i++)
+                {
+                    for (int j = (int)_activeCellPositionY - 1; j <= (int)_activeCellPositionY + 1; j++)
+                    {
+                        if (_gridCellArray[i, j].GridCellType == GridCellTypes.Empty)
+                            _gridCellArray[i, j].GridCellType = GridCellType;
+                    }
                 }
             }
         }
-
+   
         private void CheckCollidedBuildingCells()
         {
             for (int i = 0; i < Config.VerticalGridNumber; i++)
@@ -430,16 +461,31 @@ namespace Assets.Scripts.Controller.Map
                 if (_gridCellArray[clickedXIndex, clickedYIndex].GridCellType == GridCellTypes.Empty &&
                     _soldierClickedChecker)
                 {
-                    //_moveFinishXIndex = clickedXIndex;
-                    //_moveFinishYIndex = clickedYIndex;   
                     foreach (var soldier in soldiersList)
                     {
                         if (soldier.GetComponent<SoldierView>().GetSoldierController().GetSoldierSelected() == true)
-                        {
+                        { 
                             if (soldier.GetComponent<SoldierView>().GetSoldierController().GetSoldierMoving() == false)
                             {
-                                soldier.GetComponent<SoldierView>().GetSoldierController().SetSoldierMovingXIndex(exPath[1][0]);
-                                soldier.GetComponent<SoldierView>().GetSoldierController().SetSoldierMovingYIndex(exPath[1][1]);
+                                exPath = GetShortestPathWithAStarAlgorithm(soldier, (int)clickedXIndex, (int)clickedYIndex);
+                                if (exPath == null)
+                                {
+                                    _soldierClickedChecker = false;
+                                }
+                            
+                                else if (exPath.Count == 1)
+                                {
+                                    soldier.GetComponent<SoldierView>().GetSoldierController().SetSoldierMovingXIndex(exPath[0].XIndex);
+                                    soldier.GetComponent<SoldierView>().GetSoldierController().SetSoldierMovingYIndex(exPath[0].YIndex);
+
+
+                                }
+                                else if (exPath.Count > 1)
+                                {
+                                    soldier.GetComponent<SoldierView>().GetSoldierController().SetSoldierMovingXIndex(exPath[1].XIndex);
+                                    soldier.GetComponent<SoldierView>().GetSoldierController().SetSoldierMovingYIndex(exPath[1].YIndex);
+                                }
+                                
                             }
                         }
                     }
@@ -555,7 +601,7 @@ namespace Assets.Scripts.Controller.Map
             return _gridCellGameObjectArray;
         }
 
-        public List<List<int>> GetExamplePath()
+        public List<GridModel> GetExamplePath()
         {
             return exPath;
         }
@@ -563,6 +609,166 @@ namespace Assets.Scripts.Controller.Map
         public IGridCellModel[,] GetGridCellArray()
         {
             return _gridCellArray;
+        }
+
+        private List<GridModel> GetShortestPathWithAStarAlgorithm(GameObject soldier,int TargetXIndex,int TargetYIndex)
+        {
+            List<CellModelForAStar> openList = new List<CellModelForAStar>();
+            List<CellModelForAStar> closedList = new List<CellModelForAStar>();
+            List<GridModel> shortestPath = new List<GridModel>();
+            
+
+            CreateCellArrayForAStar();
+            int startGridCellXIndex = (int)soldier.GetComponent<SoldierView>().GetSoldierController().GetSoldierXIndex();
+            int startGridCellYIndex = (int)soldier.GetComponent<SoldierView>().GetSoldierController().GetSoldierYIndex();
+            CellModelForAStar startCell = cellModelAStarArray[startGridCellXIndex, startGridCellYIndex];
+            startCell.DistanceToEnd = CalculateHValue(startGridCellXIndex, startGridCellYIndex, TargetXIndex, TargetYIndex);
+            startCell.DistanceToStart = 0;
+
+            cellModelAStarArray[startCell.XIndex, startCell.YIndex].ParentXIndex = -1;
+            cellModelAStarArray[startCell.XIndex, startCell.YIndex].ParentYIndex = -1;
+
+            openList.Add(startCell);            
+            openList.Remove(startCell);
+
+            CellModelForAStar current = startCell;
+            List<CellModelForAStar> successors = FindSuccessors(current);
+            foreach (var successor in successors)
+            {
+                successor.DistanceToEnd = CalculateHValue(successor.XIndex, successor.YIndex, TargetXIndex, TargetYIndex);
+                successor.DistanceToStart = CalculateHValue(startCell.XIndex, startCell.YIndex, successor.XIndex, successor.YIndex);
+                successor.TotalDistance = successor.DistanceToEnd + successor.DistanceToStart;
+                if (!closedList.Contains(successor))
+                {
+                    cellModelAStarArray[successor.XIndex, successor.YIndex].ParentXIndex = current.XIndex;
+                    cellModelAStarArray[successor.XIndex, successor.YIndex].ParentYIndex = current.YIndex;
+                    openList.Add(successor);
+                }
+            }
+            closedList.Add(startCell);
+
+            while (openList.Count > 0)
+            {
+                openList.OrderBy(o => o.DistanceToEnd).ToList();
+                current = openList[0];
+                if (current.XIndex == TargetXIndex && current.YIndex == TargetYIndex)
+                {                   
+                    break;
+                }
+                successors = FindSuccessors(current);
+                foreach (var successor in successors)
+                {
+                   
+                    successor.DistanceToEnd = CalculateHValue(successor.XIndex, successor.YIndex, TargetXIndex, TargetYIndex);
+                    successor.DistanceToStart = CalculateHValue(startCell.XIndex, startCell.YIndex, successor.XIndex,successor.YIndex);
+                    successor.TotalDistance = successor.DistanceToEnd + successor.DistanceToStart;
+                    if (!closedList.Contains(successor) && !openList.Contains(successor))
+                    {
+                        cellModelAStarArray[successor.XIndex, successor.YIndex].ParentXIndex = current.XIndex;
+                        cellModelAStarArray[successor.XIndex, successor.YIndex].ParentYIndex = current.YIndex;  
+                        openList.Add(successor);
+                    }
+                }
+                openList.Remove(current);
+                closedList.Add(current);
+            }
+
+            while (cellModelAStarArray[current.XIndex, current.YIndex].ParentXIndex != -1 &&
+                   cellModelAStarArray[current.XIndex, current.YIndex].ParentYIndex != -1)
+            {
+                GridModel currentGridModelPath = new GridModel();
+                currentGridModelPath.XIndex = current.XIndex;
+                currentGridModelPath.YIndex = current.YIndex;
+                shortestPath.Add(currentGridModelPath);
+
+                current = cellModelAStarArray[cellModelAStarArray[current.XIndex, current.YIndex].ParentXIndex,
+                    cellModelAStarArray[current.XIndex, current.YIndex].ParentYIndex];
+            }
+
+            shortestPath.Reverse();
+            if (shortestPath[shortestPath.Count - 1].XIndex != TargetXIndex &&
+                shortestPath[shortestPath.Count - 1].YIndex != TargetYIndex)
+            {
+                return null;
+            }
+            return shortestPath;
+        }
+
+        private void CreateCellArrayForAStar()
+        {
+            for (int i = 0; i < Config.VerticalGridNumber; i++)
+            {
+                for (int j = 0; j < Config.HorizontalGridNumber; j++)
+                {
+                    CellModelForAStar cellModel = new CellModelForAStar();
+                    cellModelAStarArray[i, j] = cellModel;
+                    cellModelAStarArray[i, j].XIndex = i;
+                    cellModelAStarArray[i, j].YIndex = j;
+                }
+            }
+        }
+        private double CalculateHValue(int firstXIndex, int firstYIndex, int targetXIndex, int targetYIndex)
+        {
+
+
+            double xDiff;
+            if (targetXIndex >= firstXIndex)
+            {
+                xDiff = (double )(targetXIndex - firstXIndex);
+            }
+            else
+            {
+                xDiff = (double) (firstXIndex - targetXIndex);
+            }
+
+            double yDiff;
+            if (targetYIndex >= firstYIndex)
+            {
+                yDiff = (double) (targetYIndex - firstYIndex);
+                
+            }
+            else
+            {
+                yDiff = (double)(firstYIndex - targetYIndex);
+            }
+
+            return yDiff + xDiff;
+        }
+
+        private List<CellModelForAStar> FindSuccessors(CellModelForAStar current)
+        {
+            List<CellModelForAStar> successors = new List<CellModelForAStar>();
+            if (current.XIndex + 1 < Config.VerticalGridNumber)
+            {
+                if (_gridCellArray[current.XIndex + 1,current.YIndex].GridCellType == GridCellTypes.Empty)
+                {
+                    successors.Add(cellModelAStarArray[current.XIndex + 1, current.YIndex]);
+                }
+            }
+            if (current.XIndex - 1 >= 0)
+            {
+                
+                if (_gridCellArray[current.XIndex - 1, current.YIndex].GridCellType == GridCellTypes.Empty)
+                {
+                    successors.Add(cellModelAStarArray[current.XIndex -1, current.YIndex]);
+                }
+            }
+            if (current.YIndex + 1 < Config.HorizontalGridNumber)
+            {
+                if (_gridCellArray[current.XIndex,current.YIndex + 1].GridCellType == GridCellTypes.Empty)
+                {
+                    successors.Add(cellModelAStarArray[current.XIndex,current.YIndex + 1]);
+                }
+            }
+            if (current.YIndex - 1 >= 0)
+            {
+                if (_gridCellArray[current.XIndex,current.YIndex - 1].GridCellType == GridCellTypes.Empty)
+                {
+                    successors.Add(cellModelAStarArray[current.XIndex, current.YIndex - 1]);
+                }
+            }
+
+            return successors;
         }
     }
 }

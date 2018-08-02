@@ -1211,6 +1211,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   GridPrefab: {fileID: 1275477369339586, guid: 5c2ec630762eb954dbd385e2b96b5f10, type: 2}
+  SoldierPrefab: {fileID: 1004959213218436, guid: 0b9d5253110967b4689afc07de216c41,
+    type: 2}
 --- !u!114 &743361867
 MonoBehaviour:
   m_ObjectHideFlags: 0

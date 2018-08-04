@@ -2,6 +2,10 @@
 
 namespace Assets.Scripts.Model
 {
+    /// <summary>
+    /// Grid cell model interface class
+    /// Every grid cell can 4 different types.(empty,barrack,powerplant,soldier)
+    /// </summary>
     public enum GridCellTypes
     {
         Empty,Barrack,PowerPlant,Soldier

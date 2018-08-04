@@ -11,23 +11,15 @@ namespace Assets.Scripts.View.scroll
   
     public class ScrollPowerPlantEventHandler : MonoBehaviour {
 
-        // Use this for initialization
-        void Start () {
-		
-        }
-	
-        // Update is called once per frame
-        void Update()
-        {
 
-        }
 
-        // TO DO: this function will detect drag will be started in powerplant.
+        //this function detects drag is started in powerplant.
         public void PowerPlantDragStart()
         {
             ScrollController.Instance().PowerPlantEventChecker = true;
         }
 
+        // this function called when powerplant drag is finished.
         public void PowerPlantDragFinished()
         {
             if(MapController.Instance().GetMouseEventChecker())

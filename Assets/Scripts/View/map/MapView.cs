@@ -13,10 +13,10 @@ namespace Assets.Scripts.View.map
         public GameObject GridPrefab;
         public GameObject SoldierPrefab;
 
-        private GameObject[,] _gridCellGameArray;
+        private GameObject[,] _gridCellGameObjectsArray;
         // Use this for initialization
         void Start () {
-            _gridCellGameArray = new GameObject[Config.VerticalGridNumber, Config.HorizontalGridNumber];
+            _gridCellGameObjectsArray = new GameObject[Config.VerticalGridNumber, Config.HorizontalGridNumber];
         }
 	
         // Update is called once per frame
@@ -24,7 +24,8 @@ namespace Assets.Scripts.View.map
 		    MapController.Instance().FindTheCell();
         }
 
-        public GameObject[,] LocateGrids()
+        // This function locates gameobjects on gridcells and return gameobject 2d array to use gameobject colors.
+        public GameObject[,] LocateGameObjectsOnGridCells()
         {
              
             float startingX = Config.FirstGridStartingXCoordinate;
@@ -37,13 +38,13 @@ namespace Assets.Scripts.View.map
                     GameObject newObject = Instantiate(GridPrefab, transform);
                     newObject.transform.localPosition = new Vector2(startingX, startingY);
                     startingX += Config.GridSize;
-                    _gridCellGameArray[i, j] =  newObject;
+                    _gridCellGameObjectsArray[i, j] =  newObject;
                 }
                 startingX = Config.FirstGridStartingXCoordinate;
                 startingY -= Config.GridSize;
             }
 
-            return _gridCellGameArray;
+            return _gridCellGameObjectsArray;
         }
 
     }

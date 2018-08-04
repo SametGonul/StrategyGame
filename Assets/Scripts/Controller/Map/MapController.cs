@@ -26,32 +26,34 @@ namespace Assets.Scripts.Controller.Map
         private static MapController _instance = null;
 
         private bool _dragEventFromScrollToMap = false;
-        GameObject[,] _gridCellGameObjectArray;
+        readonly GameObject[,] _gridCellGameObjectArray;
  
         private int? _activeCellPositionX = null;
         private int? _activeCellPositionY = null;
 
-        private GridModel[,] _gridCellArray;
+        private readonly GridCellModel[,] _gridCellCellArray;
 
         private bool _barrackCollisionChecker = false;
         private bool _powerPlantCollisionChecker = false;
         private bool _soldierChecker = false;
+        
+        // counting barracks and powerplants for their name.
         private int _barrackCounter = 1;
-
         private int _powerPlantCounter = 1;
-        private List<IScrollBuildingModel> barracks = new List<IScrollBuildingModel>();
-        private List<IScrollBuildingModel> powerPlants = new List<IScrollBuildingModel>();
-        private List<GameObject> soldiersList = new List<GameObject>();
+
+        private readonly List<IScrollBuildingModel> _barracks = new List<IScrollBuildingModel>();
+        private readonly List<IScrollBuildingModel> _powerPlants = new List<IScrollBuildingModel>();
+        private readonly List<GameObject> _soldiersList = new List<GameObject>();
         private bool _soldierClickedChecker = false;
 
-        private List<GridModel> exPath = new List<GridModel>();
-        CellModelForAStar[,] cellModelAStarArray = new CellModelForAStar[Config.VerticalGridNumber, Config.HorizontalGridNumber];
+        private List<GridCellModel> _soldierPath = new List<GridCellModel>();
+        private readonly CellModelForAStar[,] _cellModelAStarArray = new CellModelForAStar[Config.VerticalGridNumber, Config.HorizontalGridNumber];
 
         private MapController()
         {
             MapView exMapView = Object.FindObjectOfType<MapView>();
-            _gridCellGameObjectArray = exMapView.LocateGrids();
-            _gridCellArray = GridController.Instance().GetGridCellArray();
+            _gridCellGameObjectArray = exMapView.LocateGameObjectsOnGridCells();
+            _gridCellCellArray = GridController.Instance().GetGridCellArray();
         }
 
         public static MapController Instance()
@@ -59,7 +61,10 @@ namespace Assets.Scripts.Controller.Map
             return _instance ?? (_instance = new MapController());
         }
 
-
+        /// <summary>
+        /// this function is called when drag is finished on map.
+        /// It checks barrack or powerplant dragged to map.
+        /// </summary>
         public void DragFinished()
         {
             _dragEventFromScrollToMap = false;
@@ -77,7 +82,7 @@ namespace Assets.Scripts.Controller.Map
                     if (_activeCellPositionY != null) barrack.YIndex = (int)_activeCellPositionY;
                     barrack.BuildingNumber = _barrackCounter;
                     _barrackCounter++;
-                    barracks.Add(barrack);
+                    _barracks.Add(barrack);
                                   
                 }
                 else
@@ -100,7 +105,7 @@ namespace Assets.Scripts.Controller.Map
                     if (_activeCellPositionY != null) powerPlant.YIndex = (int)_activeCellPositionY;
                     powerPlant.BuildingNumber = _powerPlantCounter;
                     _powerPlantCounter++;
-                    powerPlants.Add(powerPlant);
+                    _powerPlants.Add(powerPlant);
                     CheckSoldierInBuildingArea(GridCellTypes.PowerPlant);
                 }
                 else
@@ -109,16 +114,41 @@ namespace Assets.Scripts.Controller.Map
                 }
                 _soldierChecker = false;
             }
+            PreventCollision();
             _activeCellPositionY = null;
             _activeCellPositionX = null;     
         }
 
+        // This function called when drag finished, when new building dragged on building on map.
+        private void PreventCollision()
+        {
+            for (int i = 0; i < Config.VerticalGridNumber; i++)
+            {
+                for (int j = 0; j < Config.HorizontalGridNumber; j++)
+                {
+                    if (_gridCellCellArray[i, j].GridCellType == GridCellTypes.Barrack &&
+                        _gridCellGameObjectArray[i, j].gameObject.GetComponent<Image>().color == Color.green)
+                    {
+                        _gridCellCellArray[i, j].GridCellType = GridCellTypes.Empty;
+                    }
+
+                    else if (_gridCellCellArray[i, j].GridCellType == GridCellTypes.PowerPlant &&
+                             _gridCellGameObjectArray[i, j].gameObject.GetComponent<Image>().color == Color.green)
+                    {
+                        _gridCellCellArray[i, j].GridCellType = GridCellTypes.Empty;
+                    }
+                }
+            }
+        }
+
+        // This function is called enter event of mouse on map.
         public void MouseOnMap()
         {
             if(ScrollController.Instance().BarrackEventChecker || ScrollController.Instance().PowerPlantEventChecker)
                 _dragEventFromScrollToMap = true;
         }
 
+        // This function is called exit event of mouse on map.
         public void MouseOutsideMap()
         {
             _dragEventFromScrollToMap = false;
@@ -128,10 +158,11 @@ namespace Assets.Scripts.Controller.Map
         {
             return _dragEventFromScrollToMap;
         }
+
+        // Find grid cell xIndex and yIndex according to mouse position
+        // Mouse position is same for every screen resolution.
         public void FindTheCell()
         {
-            float xIndex;
-            float yIndex;
 
             if (_dragEventFromScrollToMap)
             {
@@ -144,8 +175,8 @@ namespace Assets.Scripts.Controller.Map
 
                 Vector2 worldMousePosition = new Vector2(mousePositionRatio.x * tempCanvas.GetComponent<RectTransform>().sizeDelta.x, mousePositionRatio.y * tempCanvas.GetComponent<RectTransform>().sizeDelta.y);
 
-                yIndex = (worldMousePosition.x - Config.TheMostXCoordinate)/Config.GridSize;
-                xIndex = (Config.TheMostYCoordinate - worldMousePosition.y)/ Config.GridSize;
+                float yIndex = (worldMousePosition.x - Config.TheMostXCoordinate)/Config.GridSize;
+                float xIndex = (Config.TheMostYCoordinate - worldMousePosition.y)/ Config.GridSize;
 
                 int roundedXIndex = (int)Math.Floor(xIndex);
                 int roundedYIndex = (int)Math.Floor(yIndex);
@@ -166,17 +197,22 @@ namespace Assets.Scripts.Controller.Map
                     if (ScrollController.Instance().BarrackEventChecker)
                     {
                         CheckCollidedBuildingCells();
-                        ColorTheBarrackOnMap((int)_activeCellPositionX, (int)_activeCellPositionY, Color.blue);
+                        if (_activeCellPositionX != null && _activeCellPositionY != null)
+                            ColorTheBarrackOnMap((int) _activeCellPositionX, (int) _activeCellPositionY, Color.blue);
                     }                        
                     else if (ScrollController.Instance().PowerPlantEventChecker)
                     {
                         CheckCollidedBuildingCells();
-                        ColorThePowerPlantOnMap((int)_activeCellPositionX, (int)_activeCellPositionY, Color.yellow);
+                        if (_activeCellPositionX != null && _activeCellPositionY != null)
+                            ColorThePowerPlantOnMap((int)_activeCellPositionX, (int)_activeCellPositionY, Color.yellow);
                     }                     
                 }        
             }
         }
 
+        // this function is called while barrack draggingg on map
+        // color the map 3x3 blue color
+        // if there is a collision with other buildings it colors grid red
         private void ColorTheBarrackOnMap(int xIndex,int yIndex,Color color)
         {
             if (xIndex > 0 && xIndex < Config.VerticalGridNumber - 1 && yIndex > 0 && yIndex < Config.HorizontalGridNumber - 1)
@@ -185,9 +221,9 @@ namespace Assets.Scripts.Controller.Map
                 {
                     for (int j = yIndex - 1; j <= yIndex + 1; j++)
                     {
-                        if(_gridCellArray[i,j].GridCellType == GridCellTypes.Empty)
+                        if(_gridCellCellArray[i,j].GridCellType == GridCellTypes.Empty)
                             _gridCellGameObjectArray[i,j].GetComponent<Image>().color = color;
-                        else if (_gridCellArray[i,j].GridCellType == GridCellTypes.Barrack || _gridCellArray[i,j].GridCellType == GridCellTypes.PowerPlant)
+                        else if (_gridCellCellArray[i,j].GridCellType == GridCellTypes.Barrack || _gridCellCellArray[i,j].GridCellType == GridCellTypes.PowerPlant)
                         {
                             _gridCellGameObjectArray[i, j].GetComponent<Image>().color = Color.red;
                         }
@@ -197,6 +233,9 @@ namespace Assets.Scripts.Controller.Map
             }
         }
 
+        // this function is called while powerplant draggingg on map
+        // color the map 2x3 yelllow color
+        // if there is a collision with other buildings it colors grid red
         private void ColorThePowerPlantOnMap(int xIndex, int yIndex, Color color)
         {
             if (xIndex > 0 && xIndex < Config.VerticalGridNumber && yIndex > 0 && yIndex < Config.HorizontalGridNumber - 1)
@@ -205,9 +244,9 @@ namespace Assets.Scripts.Controller.Map
                 {
                     for (int j = yIndex - 1; j <= yIndex + 1 ; j++)
                     {
-                        if (_gridCellArray[i, j].GridCellType == GridCellTypes.Empty)
+                        if (_gridCellCellArray[i, j].GridCellType == GridCellTypes.Empty)
                             _gridCellGameObjectArray[i, j].GetComponent<Image>().color = color;
-                        else if (_gridCellArray[i, j].GridCellType == GridCellTypes.Barrack || _gridCellArray[i, j].GridCellType == GridCellTypes.PowerPlant)
+                        else if (_gridCellCellArray[i, j].GridCellType == GridCellTypes.Barrack || _gridCellCellArray[i, j].GridCellType == GridCellTypes.PowerPlant)
                         {
                             _gridCellGameObjectArray[i, j].GetComponent<Image>().color = Color.red;
                         }
@@ -216,74 +255,77 @@ namespace Assets.Scripts.Controller.Map
             }
         }
 
-
-        private void CheckSoldierInBuildingArea(GridCellTypes GridCellType)
+        // On drag finish it checks if soldier is in building area.
+        // Set the cell colors on grid according to collision.
+        private void CheckSoldierInBuildingArea(GridCellTypes gridCellType)
         {
-            int IndexSetterWithBuildingType;
-            if (GridCellType == GridCellTypes.Barrack)
-            {
-                IndexSetterWithBuildingType = 1;
-            }
-            else
-            {
-                IndexSetterWithBuildingType = 0;
+            var indexSetterWithBuildingType = gridCellType == GridCellTypes.Barrack ? 1 : 0;
 
-            }
-            
-            for (int i = (int)_activeCellPositionX - 1; i <= (int)_activeCellPositionX + IndexSetterWithBuildingType; i++)
+            if (_activeCellPositionX != null && _activeCellPositionY != null)
             {
-                for (int j = (int)_activeCellPositionY - 1; j <= (int)_activeCellPositionY + 1; j++)
+                for (int i = (int) _activeCellPositionX - 1;
+                    i <= (int) _activeCellPositionX + indexSetterWithBuildingType;
+                    i++)
                 {
-                    if (_gridCellArray[i, j].GridCellType == GridCellTypes.Soldier)
-                        _soldierChecker = true;
-                }
-            }
-            if (_soldierChecker)
-            {
-                for (int i = (int)_activeCellPositionX - 1; i <= (int)_activeCellPositionX + IndexSetterWithBuildingType; i++)
-                {
-                    for (int j = (int)_activeCellPositionY - 1; j <= (int)_activeCellPositionY + 1; j++)
+                    for (int j = (int) _activeCellPositionY - 1; j <= (int) _activeCellPositionY + 1; j++)
                     {
-                        if (_gridCellArray[i, j].GridCellType != GridCellTypes.Soldier)
+                        if (_gridCellCellArray[i, j].GridCellType == GridCellTypes.Soldier)
+                            _soldierChecker = true;
+                    }
+                }
+
+                if (_soldierChecker)
+                {
+                    for (int i = (int) _activeCellPositionX - 1;
+                        i <= (int) _activeCellPositionX + indexSetterWithBuildingType;
+                        i++)
+                    {
+                        for (int j = (int) _activeCellPositionY - 1; j <= (int) _activeCellPositionY + 1; j++)
                         {
-                            _gridCellArray[i, j].GridCellType = GridCellTypes.Empty;
-                            _gridCellGameObjectArray[i, j].GetComponent<Image>().color = Color.green;
-                        }
-                        else
-                        {
-                            _gridCellArray[i, j].GridCellType = GridCellTypes.Soldier;
-                            _gridCellGameObjectArray[i, j].GetComponent<Image>().color = Color.green;
+                            if (_gridCellCellArray[i, j].GridCellType != GridCellTypes.Soldier)
+                            {
+                                _gridCellCellArray[i, j].GridCellType = GridCellTypes.Empty;
+                                _gridCellGameObjectArray[i, j].GetComponent<Image>().color = Color.green;
+                            }
+                            else
+                            {
+                                _gridCellCellArray[i, j].GridCellType = GridCellTypes.Soldier;
+                                _gridCellGameObjectArray[i, j].GetComponent<Image>().color = Color.green;
+                            }
                         }
                     }
                 }
-            }
-            
-            else
-            {
-                for (int i = (int)_activeCellPositionX - 1; i <= (int)_activeCellPositionX + IndexSetterWithBuildingType; i++)
+
+                else
                 {
-                    for (int j = (int)_activeCellPositionY - 1; j <= (int)_activeCellPositionY + 1; j++)
+                    for (int i = (int) _activeCellPositionX - 1;
+                        i <= (int) _activeCellPositionX + indexSetterWithBuildingType;
+                        i++)
                     {
-                        if (_gridCellArray[i, j].GridCellType == GridCellTypes.Empty)
-                            _gridCellArray[i, j].GridCellType = GridCellType;
+                        for (int j = (int) _activeCellPositionY - 1; j <= (int) _activeCellPositionY + 1; j++)
+                        {
+                            if (_gridCellCellArray[i, j].GridCellType == GridCellTypes.Empty)
+                                _gridCellCellArray[i, j].GridCellType = gridCellType;
+                        }
                     }
                 }
             }
         }
-   
+        
+        // Sets collided barrack and powerplant cells colors original from collision color red.
         private void CheckCollidedBuildingCells()
         {
             for (int i = 0; i < Config.VerticalGridNumber; i++)
             {
                 for (int j = 0; j < Config.HorizontalGridNumber; j++)
                 {
-                    if (_gridCellArray[i, j].GridCellType == GridCellTypes.Barrack &&
+                    if (_gridCellCellArray[i, j].GridCellType == GridCellTypes.Barrack &&
                         _gridCellGameObjectArray[i, j].gameObject.GetComponent<Image>().color == Color.red)
                     {
                         _gridCellGameObjectArray[i, j].gameObject.GetComponent<Image>().color = Color.blue;
                        
                     }
-                    else if (_gridCellArray[i, j].GridCellType == GridCellTypes.PowerPlant &&
+                    else if (_gridCellCellArray[i, j].GridCellType == GridCellTypes.PowerPlant &&
                              _gridCellGameObjectArray[i, j].gameObject.GetComponent<Image>().color == Color.red)
                     {
                         _gridCellGameObjectArray[i, j].gameObject.GetComponent<Image>().color = Color.yellow;
@@ -292,6 +334,8 @@ namespace Assets.Scripts.Controller.Map
             }
         }
 
+        // On drag finish for barracks, this checks it crashed with other buildings
+        // set the color of cells after collision on drag finish
         private void CheckCollidedBarraksOnDragFinish()
         {
             
@@ -299,12 +343,12 @@ namespace Assets.Scripts.Controller.Map
             {
                 for (int j = (int) _activeCellPositionY - 1; j <= (int) _activeCellPositionY + 1; j++)
                 {
-                    if (_gridCellArray[i, j].GridCellType == GridCellTypes.Barrack &&
+                    if (_gridCellCellArray[i, j].GridCellType == GridCellTypes.Barrack &&
                         _gridCellGameObjectArray[i, j].gameObject.GetComponent<Image>().color == Color.red)
                     {
                         _barrackCollisionChecker = true;
                     }
-                    else if (_gridCellArray[i, j].GridCellType == GridCellTypes.PowerPlant &&
+                    else if (_gridCellCellArray[i, j].GridCellType == GridCellTypes.PowerPlant &&
                              _gridCellGameObjectArray[i, j].gameObject.GetComponent<Image>().color == Color.red)
                     {
                         _barrackCollisionChecker = true;
@@ -321,14 +365,19 @@ namespace Assets.Scripts.Controller.Map
                         if (_gridCellGameObjectArray[i, j].gameObject.GetComponent<Image>().color == Color.blue)
                         {
                             _gridCellGameObjectArray[i, j].gameObject.GetComponent<Image>().color = Color.green;
-                            _gridCellArray[i, j].GridCellType = GridCellTypes.Empty;
+                            _gridCellCellArray[i, j].GridCellType = GridCellTypes.Empty;
                         }
                         if (_gridCellGameObjectArray[i, j].gameObject.GetComponent<Image>().color == Color.red)
                         {
-                            if(_gridCellArray[i,j].GridCellType == GridCellTypes.Barrack)
+                            if(_gridCellCellArray[i,j].GridCellType == GridCellTypes.Barrack)
                                 _gridCellGameObjectArray[i, j].gameObject.GetComponent<Image>().color = Color.blue;
-                            else if(_gridCellArray[i,j].GridCellType == GridCellTypes.PowerPlant)
+                            else if(_gridCellCellArray[i,j].GridCellType == GridCellTypes.PowerPlant)
                                 _gridCellGameObjectArray[i, j].gameObject.GetComponent<Image>().color = Color.yellow;
+                        }
+
+                        if (_gridCellGameObjectArray[i, j].gameObject.GetComponent<Image>().color == Color.green)
+                        {
+                            _gridCellCellArray[i, j].GridCellType = GridCellTypes.Empty;    
                         }
 
                     }
@@ -336,6 +385,9 @@ namespace Assets.Scripts.Controller.Map
             }
 
         }
+
+        // On drag finish for powerplants, this checks it crashed with other buildings
+        // set the color of cells after collision on drag finish
         private void CheckCollidedPowerPlantsOnDragFinish()
         {
             
@@ -343,12 +395,12 @@ namespace Assets.Scripts.Controller.Map
             {
                 for (int j = (int)_activeCellPositionY - 1; j <= (int)_activeCellPositionY + 1; j++)
                 {
-                    if (_gridCellArray[i, j].GridCellType == GridCellTypes.PowerPlant &&
+                    if (_gridCellCellArray[i, j].GridCellType == GridCellTypes.PowerPlant &&
                         _gridCellGameObjectArray[i, j].gameObject.GetComponent<Image>().color == Color.red)
                     {
                         _powerPlantCollisionChecker = true;
                     }
-                    else if (_gridCellArray[i, j].GridCellType == GridCellTypes.Barrack &&
+                    else if (_gridCellCellArray[i, j].GridCellType == GridCellTypes.Barrack &&
                              _gridCellGameObjectArray[i, j].gameObject.GetComponent<Image>().color == Color.red)
                     {
                         _powerPlantCollisionChecker = true;
@@ -365,7 +417,7 @@ namespace Assets.Scripts.Controller.Map
                         if (_gridCellGameObjectArray[i, j].gameObject.GetComponent<Image>().color == Color.yellow)
                         {
                             _gridCellGameObjectArray[i, j].gameObject.GetComponent<Image>().color = Color.green;
-                            _gridCellArray[i, j].GridCellType = GridCellTypes.Empty;
+                            _gridCellCellArray[i, j].GridCellType = GridCellTypes.Empty;
                         }
                     }
                 }
@@ -375,9 +427,9 @@ namespace Assets.Scripts.Controller.Map
                     {
                         if (_gridCellGameObjectArray[i, j].gameObject.GetComponent<Image>().color == Color.red)
                         {
-                            if (_gridCellArray[i, j].GridCellType == GridCellTypes.Barrack)
+                            if (_gridCellCellArray[i, j].GridCellType == GridCellTypes.Barrack)
                                 _gridCellGameObjectArray[i, j].gameObject.GetComponent<Image>().color = Color.blue;
-                            else if (_gridCellArray[i, j].GridCellType == GridCellTypes.PowerPlant)
+                            else if (_gridCellCellArray[i, j].GridCellType == GridCellTypes.PowerPlant)
                                 _gridCellGameObjectArray[i, j].gameObject.GetComponent<Image>().color = Color.yellow;
                         }
                     }
@@ -386,6 +438,7 @@ namespace Assets.Scripts.Controller.Map
 
         }
 
+        // find gridcell xIndex,yIndex and checks clicked on gameobject or not.
         public void MouseClickOnMap(int mouseClickType)
         {
             float mouseRatioX = Input.mousePosition.x / Screen.width;
@@ -395,39 +448,40 @@ namespace Assets.Scripts.Controller.Map
             Vector2 mousePositionRatio = new Vector2(mouseRatioX - 0.5f, mouseRatioY - 0.5f);
             Canvas tempCanvas = GameObject.Find("Canvas").GetComponent<Canvas>();
 
-            float yIndex;
-            float xIndex;
             Vector2 worldMousePosition = new Vector2(mousePositionRatio.x * tempCanvas.GetComponent<RectTransform>().sizeDelta.x, mousePositionRatio.y * tempCanvas.GetComponent<RectTransform>().sizeDelta.y);
 
-            yIndex = (worldMousePosition.x - Config.TheMostXCoordinate) / Config.GridSize;
-            xIndex = (Config.TheMostYCoordinate - worldMousePosition.y) / Config.GridSize;
+            float yIndex = (worldMousePosition.x - Config.TheMostXCoordinate) / Config.GridSize;
+            float xIndex = (Config.TheMostYCoordinate - worldMousePosition.y) / Config.GridSize;
 
             int roundedXIndex = (int)Math.Floor(xIndex);
             int roundedYIndex = (int)Math.Floor(yIndex);
             CheckClickIsGameObject(roundedXIndex, roundedYIndex,mouseClickType);
         }
 
+        // this function check mouse clicked on the building in map or 
+        // it is clicked for soldier
+        // when clicked left on soldier, it is selected, after this when click empty grid cell right click, soldier starts to move.
         private void CheckClickIsGameObject(int clickedXIndex, int clickedYIndex,int mouseClickType)
         {
             
-            for (int i = 0; i < barracks.Count; i++)
+            for (int i = 0; i < _barracks.Count; i++)
             {
-                if (barracks[i].XIndex - clickedXIndex >= -1 && barracks[i].XIndex - clickedXIndex <= 1)
+                if (_barracks[i].XIndex - clickedXIndex >= -1 && _barracks[i].XIndex - clickedXIndex <= 1)
                 {
-                    if (barracks[i].YIndex - clickedYIndex >= -1 && barracks[i].YIndex - clickedYIndex <= 1)
+                    if (_barracks[i].YIndex - clickedYIndex >= -1 && _barracks[i].YIndex - clickedYIndex <= 1)
                     {
-                        InfoController.Instance().ShowInfoClickedObject(barracks[i]);
+                        InfoController.Instance().ShowInfoClickedObject(_barracks[i]);
                         break;
                     }
                 }
             }
-            for (int i = 0; i < powerPlants.Count; i++)
+            for (int i = 0; i < _powerPlants.Count; i++)
             {
-                if (powerPlants[i].XIndex - clickedXIndex >= 0 && powerPlants[i].XIndex - clickedXIndex <= 1)
+                if (_powerPlants[i].XIndex - clickedXIndex >= 0 && _powerPlants[i].XIndex - clickedXIndex <= 1)
                 {
-                    if (powerPlants[i].YIndex - clickedYIndex >= -1 && powerPlants[i].YIndex - clickedYIndex <= 1)
+                    if (_powerPlants[i].YIndex - clickedYIndex >= -1 && _powerPlants[i].YIndex - clickedYIndex <= 1)
                     {
-                        InfoController.Instance().ShowInfoClickedObject(powerPlants[i]);
+                        InfoController.Instance().ShowInfoClickedObject(_powerPlants[i]);
                         break;
                     }          
                 }
@@ -435,9 +489,9 @@ namespace Assets.Scripts.Controller.Map
 
             if (mouseClickType == 0)
             {
-                if (_gridCellArray[clickedXIndex, clickedYIndex].GridCellType == GridCellTypes.Soldier)
+                if (_gridCellCellArray[clickedXIndex, clickedYIndex].GridCellType == GridCellTypes.Soldier)
                 {
-                    foreach (var soldier in soldiersList)
+                    foreach (var soldier in _soldiersList)
                     {
                         if (soldier.transform.position ==
                             _gridCellGameObjectArray[clickedXIndex, clickedYIndex].transform.position)
@@ -447,7 +501,6 @@ namespace Assets.Scripts.Controller.Map
                             soldier.GetComponent<SoldierView>().GetSoldierController().SetSoldierSelected(true);
                         }
                     }
-
                     _soldierClickedChecker = true;
                 }
                 else
@@ -458,41 +511,50 @@ namespace Assets.Scripts.Controller.Map
 
             if (mouseClickType == 1)
             {
-                if (_gridCellArray[clickedXIndex, clickedYIndex].GridCellType == GridCellTypes.Empty &&
+                if (_gridCellCellArray[clickedXIndex, clickedYIndex].GridCellType == GridCellTypes.Empty &&
                     _soldierClickedChecker)
                 {
-                    foreach (var soldier in soldiersList)
+                    foreach (var soldier in _soldiersList)
                     {
                         if (soldier.GetComponent<SoldierView>().GetSoldierController().GetSoldierSelected() == true)
                         { 
                             if (soldier.GetComponent<SoldierView>().GetSoldierController().GetSoldierMoving() == false)
                             {
-                                exPath = GetShortestPathWithAStarAlgorithm(soldier, (int)clickedXIndex, (int)clickedYIndex);
-                                if (exPath == null)
+                                if (soldier.GetComponent<SoldierView>().GetSoldierController().GetSoldierHasPath() ==
+                                    false)
                                 {
-                                    _soldierClickedChecker = false;
-                                }
-                            
-                                else if (exPath.Count == 1)
-                                {
-                                    soldier.GetComponent<SoldierView>().GetSoldierController().SetSoldierMovingXIndex(exPath[0].XIndex);
-                                    soldier.GetComponent<SoldierView>().GetSoldierController().SetSoldierMovingYIndex(exPath[0].YIndex);
+                                    _soldierPath = GetShortestPathWithAStarAlgorithm(soldier, (int)clickedXIndex, (int)clickedYIndex);
+                                    soldier.GetComponent<SoldierView>().GetSoldierController().SetSoldierPath(_soldierPath);
+                                    soldier.GetComponent<SoldierView>().GetSoldierController().SetSoldierHasPath(true);
+
+                                    if (_soldierPath == null)
+                                    {
+                                        soldier.GetComponent<SoldierView>().GetSoldierController().SetSoldierHasPath(false);
+                                    }
+                                    else if (_soldierPath.Count == 1)
+                                    {
+                                        soldier.GetComponent<SoldierView>().GetSoldierController().SetSoldierMovingXIndex(_soldierPath[0].XIndex);
+                                        soldier.GetComponent<SoldierView>().GetSoldierController().SetSoldierMovingYIndex(_soldierPath[0].YIndex);
 
 
+                                    }
+                                    else if (_soldierPath.Count > 1)
+                                    {
+                                        soldier.GetComponent<SoldierView>().GetSoldierController().SetSoldierMovingXIndex(_soldierPath[1].XIndex);
+                                        soldier.GetComponent<SoldierView>().GetSoldierController().SetSoldierMovingYIndex(_soldierPath[1].YIndex);
+                                    }
                                 }
-                                else if (exPath.Count > 1)
-                                {
-                                    soldier.GetComponent<SoldierView>().GetSoldierController().SetSoldierMovingXIndex(exPath[1].XIndex);
-                                    soldier.GetComponent<SoldierView>().GetSoldierController().SetSoldierMovingYIndex(exPath[1].YIndex);
-                                }
-                                
                             }
+
+                            soldier.GetComponent<SoldierView>().GetSoldierController().SetSoldierSelected(false);
                         }
                     }
                 }
             }
         }
 
+        // Finds suitable place for soldiers.
+        // when soldier is created, it starts mid-down position of barrack and surround the barracks.
         public void FindSuitableSoldierPosition(IScrollBuildingModel selectedBuilding)
         {
             int currentYIndex = selectedBuilding.YIndex;
@@ -501,7 +563,7 @@ namespace Assets.Scripts.Controller.Map
             {
                 if (currentXIndex <= Config.VerticalGridNumber - 1)
                 {
-                    if (_gridCellArray[currentXIndex, currentYIndex].GridCellType == GridCellTypes.Empty)
+                    if (_gridCellCellArray[currentXIndex, currentYIndex].GridCellType == GridCellTypes.Empty)
                     {
                         CreateSoldierOnMap(currentXIndex, currentYIndex);
                         return;
@@ -515,7 +577,7 @@ namespace Assets.Scripts.Controller.Map
                 {
                     if (currentXIndex >= 0 && currentXIndex < Config.VerticalGridNumber)
                     {
-                        if (_gridCellArray[currentXIndex, currentYIndex].GridCellType == GridCellTypes.Empty)
+                        if (_gridCellCellArray[currentXIndex, currentYIndex].GridCellType == GridCellTypes.Empty)
                         {
                             CreateSoldierOnMap(currentXIndex, currentYIndex);
                             return;
@@ -538,7 +600,7 @@ namespace Assets.Scripts.Controller.Map
                     if (currentYIndex < Config.HorizontalGridNumber)
                     {
 
-                        if (_gridCellArray[currentXIndex, currentYIndex].GridCellType == GridCellTypes.Empty)
+                        if (_gridCellCellArray[currentXIndex, currentYIndex].GridCellType == GridCellTypes.Empty)
                         {
                             CreateSoldierOnMap(currentXIndex, currentYIndex);
                             return;
@@ -559,7 +621,7 @@ namespace Assets.Scripts.Controller.Map
 
                 for (; currentXIndex < selectedBuilding.XIndex + 2; currentXIndex++)
                 {
-                    if (_gridCellArray[currentXIndex, currentYIndex].GridCellType == GridCellTypes.Empty)
+                    if (_gridCellCellArray[currentXIndex, currentYIndex].GridCellType == GridCellTypes.Empty)
                     {
                         CreateSoldierOnMap(currentXIndex, currentYIndex);
                         return;
@@ -578,7 +640,7 @@ namespace Assets.Scripts.Controller.Map
             {
                 for (; currentYIndex > selectedBuilding.YIndex; currentYIndex--)
                 {
-                    if (_gridCellArray[currentXIndex, currentYIndex].GridCellType == GridCellTypes.Empty)
+                    if (_gridCellCellArray[currentXIndex, currentYIndex].GridCellType == GridCellTypes.Empty)
                     {
                         CreateSoldierOnMap(currentXIndex,currentYIndex);
                         return;
@@ -587,46 +649,34 @@ namespace Assets.Scripts.Controller.Map
             }
         }
 
+        // Create soldier on suitable grid cell
         private void CreateSoldierOnMap(int xIndex, int yIndex)
         {
-            _gridCellArray[xIndex, yIndex].GridCellType = GridCellTypes.Soldier;
+            _gridCellCellArray[xIndex, yIndex].GridCellType = GridCellTypes.Soldier;
             MapView exMapView = Object.FindObjectOfType<MapView>();
             GameObject soldier = Object.Instantiate(exMapView.SoldierPrefab, exMapView.transform);
             soldier.transform.localPosition = _gridCellGameObjectArray[xIndex, yIndex].transform.localPosition;
-            soldiersList.Add(soldier);
+            _soldiersList.Add(soldier);
         }
 
-        public GameObject[,] GetObjectList()
-        {
-            return _gridCellGameObjectArray;
-        }
 
-        public List<GridModel> GetExamplePath()
-        {
-            return exPath;
-        }
-
-        public IGridCellModel[,] GetGridCellArray()
-        {
-            return _gridCellArray;
-        }
-
-        private List<GridModel> GetShortestPathWithAStarAlgorithm(GameObject soldier,int TargetXIndex,int TargetYIndex)
+        // AStar algorithm search function and get shortest path for the soldier with given Target point
+        private List<GridCellModel> GetShortestPathWithAStarAlgorithm(GameObject soldier,int TargetXIndex,int TargetYIndex)
         {
             List<CellModelForAStar> openList = new List<CellModelForAStar>();
             List<CellModelForAStar> closedList = new List<CellModelForAStar>();
-            List<GridModel> shortestPath = new List<GridModel>();
+            List<GridCellModel> shortestPath = new List<GridCellModel>();
             
 
             CreateCellArrayForAStar();
             int startGridCellXIndex = (int)soldier.GetComponent<SoldierView>().GetSoldierController().GetSoldierXIndex();
             int startGridCellYIndex = (int)soldier.GetComponent<SoldierView>().GetSoldierController().GetSoldierYIndex();
-            CellModelForAStar startCell = cellModelAStarArray[startGridCellXIndex, startGridCellYIndex];
-            startCell.DistanceToEnd = CalculateHValue(startGridCellXIndex, startGridCellYIndex, TargetXIndex, TargetYIndex);
+            CellModelForAStar startCell = _cellModelAStarArray[startGridCellXIndex, startGridCellYIndex];
+            startCell.DistanceToEnd = CalculateDistanceValue(startGridCellXIndex, startGridCellYIndex, TargetXIndex, TargetYIndex);
             startCell.DistanceToStart = 0;
 
-            cellModelAStarArray[startCell.XIndex, startCell.YIndex].ParentXIndex = -1;
-            cellModelAStarArray[startCell.XIndex, startCell.YIndex].ParentYIndex = -1;
+            _cellModelAStarArray[startCell.XIndex, startCell.YIndex].ParentXIndex = -1;
+            _cellModelAStarArray[startCell.XIndex, startCell.YIndex].ParentYIndex = -1;
 
             openList.Add(startCell);            
             openList.Remove(startCell);
@@ -635,13 +685,13 @@ namespace Assets.Scripts.Controller.Map
             List<CellModelForAStar> successors = FindSuccessors(current);
             foreach (var successor in successors)
             {
-                successor.DistanceToEnd = CalculateHValue(successor.XIndex, successor.YIndex, TargetXIndex, TargetYIndex);
-                successor.DistanceToStart = CalculateHValue(startCell.XIndex, startCell.YIndex, successor.XIndex, successor.YIndex);
+                successor.DistanceToEnd = CalculateDistanceValue(successor.XIndex, successor.YIndex, TargetXIndex, TargetYIndex);
+                successor.DistanceToStart = CalculateDistanceValue(startCell.XIndex, startCell.YIndex, successor.XIndex, successor.YIndex);
                 successor.TotalDistance = successor.DistanceToEnd + successor.DistanceToStart;
                 if (!closedList.Contains(successor))
                 {
-                    cellModelAStarArray[successor.XIndex, successor.YIndex].ParentXIndex = current.XIndex;
-                    cellModelAStarArray[successor.XIndex, successor.YIndex].ParentYIndex = current.YIndex;
+                    _cellModelAStarArray[successor.XIndex, successor.YIndex].ParentXIndex = current.XIndex;
+                    _cellModelAStarArray[successor.XIndex, successor.YIndex].ParentYIndex = current.YIndex;
                     openList.Add(successor);
                 }
             }
@@ -659,13 +709,13 @@ namespace Assets.Scripts.Controller.Map
                 foreach (var successor in successors)
                 {
                    
-                    successor.DistanceToEnd = CalculateHValue(successor.XIndex, successor.YIndex, TargetXIndex, TargetYIndex);
-                    successor.DistanceToStart = CalculateHValue(startCell.XIndex, startCell.YIndex, successor.XIndex,successor.YIndex);
+                    successor.DistanceToEnd = CalculateDistanceValue(successor.XIndex, successor.YIndex, TargetXIndex, TargetYIndex);
+                    successor.DistanceToStart = CalculateDistanceValue(startCell.XIndex, startCell.YIndex, successor.XIndex,successor.YIndex);
                     successor.TotalDistance = successor.DistanceToEnd + successor.DistanceToStart;
                     if (!closedList.Contains(successor) && !openList.Contains(successor))
                     {
-                        cellModelAStarArray[successor.XIndex, successor.YIndex].ParentXIndex = current.XIndex;
-                        cellModelAStarArray[successor.XIndex, successor.YIndex].ParentYIndex = current.YIndex;  
+                        _cellModelAStarArray[successor.XIndex, successor.YIndex].ParentXIndex = current.XIndex;
+                        _cellModelAStarArray[successor.XIndex, successor.YIndex].ParentYIndex = current.YIndex;  
                         openList.Add(successor);
                     }
                 }
@@ -673,16 +723,16 @@ namespace Assets.Scripts.Controller.Map
                 closedList.Add(current);
             }
 
-            while (cellModelAStarArray[current.XIndex, current.YIndex].ParentXIndex != -1 &&
-                   cellModelAStarArray[current.XIndex, current.YIndex].ParentYIndex != -1)
+            while (_cellModelAStarArray[current.XIndex, current.YIndex].ParentXIndex != -1 &&
+                   _cellModelAStarArray[current.XIndex, current.YIndex].ParentYIndex != -1)
             {
-                GridModel currentGridModelPath = new GridModel();
-                currentGridModelPath.XIndex = current.XIndex;
-                currentGridModelPath.YIndex = current.YIndex;
-                shortestPath.Add(currentGridModelPath);
+                GridCellModel currentGridCellModelPath = new GridCellModel();
+                currentGridCellModelPath.XIndex = current.XIndex;
+                currentGridCellModelPath.YIndex = current.YIndex;
+                shortestPath.Add(currentGridCellModelPath);
 
-                current = cellModelAStarArray[cellModelAStarArray[current.XIndex, current.YIndex].ParentXIndex,
-                    cellModelAStarArray[current.XIndex, current.YIndex].ParentYIndex];
+                current = _cellModelAStarArray[_cellModelAStarArray[current.XIndex, current.YIndex].ParentXIndex,
+                    _cellModelAStarArray[current.XIndex, current.YIndex].ParentYIndex];
             }
 
             shortestPath.Reverse();
@@ -694,6 +744,7 @@ namespace Assets.Scripts.Controller.Map
             return shortestPath;
         }
 
+        // Create AStar gridcell models for each grid cell
         private void CreateCellArrayForAStar()
         {
             for (int i = 0; i < Config.VerticalGridNumber; i++)
@@ -701,13 +752,15 @@ namespace Assets.Scripts.Controller.Map
                 for (int j = 0; j < Config.HorizontalGridNumber; j++)
                 {
                     CellModelForAStar cellModel = new CellModelForAStar();
-                    cellModelAStarArray[i, j] = cellModel;
-                    cellModelAStarArray[i, j].XIndex = i;
-                    cellModelAStarArray[i, j].YIndex = j;
+                    _cellModelAStarArray[i, j] = cellModel;
+                    _cellModelAStarArray[i, j].XIndex = i;
+                    _cellModelAStarArray[i, j].YIndex = j;
                 }
             }
         }
-        private double CalculateHValue(int firstXIndex, int firstYIndex, int targetXIndex, int targetYIndex)
+
+        // calculates distance between object and endpoint or startingpoint.
+        private double CalculateDistanceValue(int firstXIndex, int firstYIndex, int targetXIndex, int targetYIndex)
         {
 
 
@@ -735,40 +788,58 @@ namespace Assets.Scripts.Controller.Map
             return yDiff + xDiff;
         }
 
+        // Find grid cell successors if they are not building and soldier.
         private List<CellModelForAStar> FindSuccessors(CellModelForAStar current)
         {
             List<CellModelForAStar> successors = new List<CellModelForAStar>();
             if (current.XIndex + 1 < Config.VerticalGridNumber)
             {
-                if (_gridCellArray[current.XIndex + 1,current.YIndex].GridCellType == GridCellTypes.Empty)
+                if (_gridCellCellArray[current.XIndex + 1,current.YIndex].GridCellType == GridCellTypes.Empty)
                 {
-                    successors.Add(cellModelAStarArray[current.XIndex + 1, current.YIndex]);
+                    successors.Add(_cellModelAStarArray[current.XIndex + 1, current.YIndex]);
                 }
             }
             if (current.XIndex - 1 >= 0)
             {
                 
-                if (_gridCellArray[current.XIndex - 1, current.YIndex].GridCellType == GridCellTypes.Empty)
+                if (_gridCellCellArray[current.XIndex - 1, current.YIndex].GridCellType == GridCellTypes.Empty)
                 {
-                    successors.Add(cellModelAStarArray[current.XIndex -1, current.YIndex]);
+                    successors.Add(_cellModelAStarArray[current.XIndex -1, current.YIndex]);
                 }
             }
             if (current.YIndex + 1 < Config.HorizontalGridNumber)
             {
-                if (_gridCellArray[current.XIndex,current.YIndex + 1].GridCellType == GridCellTypes.Empty)
+                if (_gridCellCellArray[current.XIndex,current.YIndex + 1].GridCellType == GridCellTypes.Empty)
                 {
-                    successors.Add(cellModelAStarArray[current.XIndex,current.YIndex + 1]);
+                    successors.Add(_cellModelAStarArray[current.XIndex,current.YIndex + 1]);
                 }
             }
             if (current.YIndex - 1 >= 0)
             {
-                if (_gridCellArray[current.XIndex,current.YIndex - 1].GridCellType == GridCellTypes.Empty)
+                if (_gridCellCellArray[current.XIndex,current.YIndex - 1].GridCellType == GridCellTypes.Empty)
                 {
-                    successors.Add(cellModelAStarArray[current.XIndex, current.YIndex - 1]);
+                    successors.Add(_cellModelAStarArray[current.XIndex, current.YIndex - 1]);
                 }
             }
 
             return successors;
         }
+
+
+        public GameObject[,] GetObjectList()
+        {
+            return _gridCellGameObjectArray;
+        }
+
+        public List<GridCellModel> GetExamplePath()
+        {
+            return _soldierPath;
+        }
+
+        public IGridCellModel[,] GetGridCellArray()
+        {
+            return _gridCellCellArray;
+        }
+
     }
 }

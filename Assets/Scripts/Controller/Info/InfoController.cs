@@ -9,22 +9,38 @@ using UnityEngine.UI;
 using Object = UnityEngine.Object;
 
 namespace Assets.Scripts.Controller.Info
-{
+{   
+    /// <summary>
+    /// Info Controller singleton class. This class connects info model and info view.
+    /// </summary>
     public class InfoController
     {
         private static InfoController _instance = null;
 
-        private InformationView _informationView;
+        private readonly InformationView _informationView;
         private IScrollBuildingModel _currentBuildingOnInfo;
+        
+
+        // Constructor for info controller
         private InfoController()
         {
             _informationView = Object.FindObjectOfType<InformationView>();
         }
+        
+        /// <summary>
+        /// First time create singleton instance then reach it.
+        /// </summary>
+        /// <returns> signleton instance </returns>
         public static InfoController Instance()
         {
             return _instance ?? (_instance = new InfoController());
         }
 
+        /// <summary>
+        /// According to parameter name that shows information of building in the view
+        /// And set buttons and images components.
+        /// </summary>
+        /// <param name="building"></param>
         public void ShowInfoClickedObject(IScrollBuildingModel building)
         {
 
@@ -32,7 +48,8 @@ namespace Assets.Scripts.Controller.Info
 
             _informationView.BuildingNameText.enabled = true;
             _informationView.BuildingNameText.text = building.Name + building.BuildingNumber;
-
+            
+            // Comparison parameter building name with the static building names.
             if (building.Name == Config.BarrackName)
             {
                 _informationView.BuildingImage.color = Color.blue;
@@ -58,6 +75,9 @@ namespace Assets.Scripts.Controller.Info
         }
 
 
+        /// <summary>
+        /// when soldier create button is clicked this function is called.
+        /// </summary>
         public void CreateSoldierOnMap()
         {
             Map.MapController.Instance().FindSuitableSoldierPosition(_currentBuildingOnInfo);

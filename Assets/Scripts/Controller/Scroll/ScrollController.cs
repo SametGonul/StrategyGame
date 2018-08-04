@@ -2,6 +2,7 @@
 using System.Linq;
 using Assets.Scripts.View.scroll;
 using UnityEngine;
+using Assets.Scripts.StrategyGame.conf;
 
 namespace Assets.Scripts.Controller.Scroll
 {
@@ -12,8 +13,8 @@ namespace Assets.Scripts.Controller.Scroll
     public class ScrollController
     {
         // keep building controller for every building
-        private List<ScrollBuildingController> _buildingControllers = new List<ScrollBuildingController>();  
-        private static ScrollController instance = null; // singleton instance
+        private readonly List<ScrollBuildingController> _buildingControllers = new List<ScrollBuildingController>();  
+        private static ScrollController _instance = null; // singleton instance
 
         public bool BarrackEventChecker = false;
         public bool PowerPlantEventChecker = false;
@@ -26,39 +27,35 @@ namespace Assets.Scripts.Controller.Scroll
         // creating instance
         public static ScrollController Instance()
         {
-            return instance ?? (instance = new ScrollController());
+            return _instance ?? (_instance = new ScrollController());
         }
         
-
-        // Use this for initialization
-        
-        //
+        // move buildings while drag occurs in scroll.
         public void MoveBuildings(float difference)
         {
-            int Speed = 500;
             for (int i = 0; i < _buildingControllers.Count(); i++)
             {
                 if (difference < 0)
                 {
-                    _buildingControllers.ElementAt(i)._scrollBuildingView.transform.position = new Vector2(
-                        _buildingControllers.ElementAt(i)._scrollBuildingView.transform.position.x,
-                        _buildingControllers.ElementAt(i)._scrollBuildingView.transform.position.y + (Speed * Time.deltaTime));
+                    _buildingControllers.ElementAt(i).ScrollBuildingView.transform.position = new Vector2(
+                        _buildingControllers.ElementAt(i).ScrollBuildingView.transform.position.x,
+                        _buildingControllers.ElementAt(i).ScrollBuildingView.transform.position.y + (Config.ScrollBuildingSpeed * Time.deltaTime));
                 }
 
                 else
                 {
-                    _buildingControllers.ElementAt(i)._scrollBuildingView.transform.position = new Vector2(
-                        _buildingControllers.ElementAt(i)._scrollBuildingView.transform.position.x,
-                        _buildingControllers.ElementAt(i)._scrollBuildingView.transform.position.y + (-Speed * Time.deltaTime));
+                    _buildingControllers.ElementAt(i).ScrollBuildingView.transform.position = new Vector2(
+                        _buildingControllers.ElementAt(i).ScrollBuildingView.transform.position.x,
+                        _buildingControllers.ElementAt(i).ScrollBuildingView.transform.position.y + (-Config.ScrollBuildingSpeed * Time.deltaTime));
                 }
 
             }
-
         }
 
+        // Find and  add building objects controllers in scroll to list.
         private void AddScrollviewBuildingControllers()
         {
-            IEnumerable<ScrollBuildingView> buildingList = GameObject.FindObjectsOfType<MonoBehaviour>().OfType<ScrollBuildingView>();
+            IEnumerable<ScrollBuildingView> buildingList = Object.FindObjectsOfType<MonoBehaviour>().OfType<ScrollBuildingView>().ToList();
             for (int i = 0; i < buildingList.Count(); i++)
             {
                 ScrollBuildingController scrollBuildingController = new ScrollBuildingController(buildingList.ElementAt(i));

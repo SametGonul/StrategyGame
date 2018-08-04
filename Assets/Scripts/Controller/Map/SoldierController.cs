@@ -15,22 +15,25 @@ namespace Assets.Scripts.Controller.Map
 
         private bool _soldierSelected = false;
         private bool _soldierMoving = false;
-
+        private bool _hasPath = false;
         private readonly SoldierView _soldierView;
+        private int _i = 2; 
 
-        private int _i = 2;
+        private List<GridCellModel> _exPath;
 
         public SoldierController(SoldierView soldierView)
         {
             _soldierView = soldierView;
         }
        
+        // this function called update of soldier view when soldier is given end point, it starts to move
+        // It goes 1 grid cell from the path when conditions are provided. 
         public void Move()
         {
+            
             if (_soldierXIndex != null && _soldierYIndex != null && _moveFinishXIndex != null &&
                 _moveFinishYIndex != null)
             {
-
                 if (_soldierXIndex > _moveFinishXIndex)
                 {
                     _soldierMoving = true;
@@ -39,7 +42,6 @@ namespace Assets.Scripts.Controller.Map
                         MapController.Instance().GetObjectList()[(int)_moveFinishXIndex, (int)_moveFinishYIndex].transform.localPosition.y)
                     {
                         _soldierView.transform.localPosition = MapController.Instance().GetObjectList()[(int)_moveFinishXIndex, (int)_moveFinishYIndex].transform.localPosition;
-                        _soldierSelected = false;
                         _soldierMoving = false;
                         ContinueMove();
                     }
@@ -56,8 +58,6 @@ namespace Assets.Scripts.Controller.Map
                         MapController.Instance().GetObjectList()[(int)_moveFinishXIndex, (int)_moveFinishYIndex].transform.localPosition.y)
                     {
                         _soldierView.transform.localPosition = MapController.Instance().GetObjectList()[(int)_moveFinishXIndex, (int)_moveFinishYIndex].transform.localPosition;
-
-                        _soldierSelected = false;
                         _soldierMoving = false;
                         ContinueMove();
                     }
@@ -74,8 +74,6 @@ namespace Assets.Scripts.Controller.Map
                         MapController.Instance().GetObjectList()[(int)_moveFinishXIndex, (int)_moveFinishYIndex].transform.localPosition.x)
                     {
                         _soldierView.transform.localPosition = MapController.Instance().GetObjectList()[(int)_moveFinishXIndex, (int)_moveFinishYIndex].transform.localPosition;
-
-                        _soldierSelected = false;
                         _soldierMoving = false;
                         ContinueMove();
 
@@ -92,7 +90,6 @@ namespace Assets.Scripts.Controller.Map
                         MapController.Instance().GetObjectList()[(int)_moveFinishXIndex, (int)_moveFinishYIndex].transform.localPosition.x)
                     {
                         _soldierView.transform.localPosition = MapController.Instance().GetObjectList()[(int)_moveFinishXIndex, (int)_moveFinishYIndex].transform.localPosition;
-                        _soldierSelected = false;
                         _soldierMoving = false;
                         ContinueMove();
                     }
@@ -102,30 +99,52 @@ namespace Assets.Scripts.Controller.Map
             }
         }
 
+        // this function is called while path is not finished
         private void ContinueMove()
         {
-
-            List<GridModel> exPath = MapController.Instance().GetExamplePath();
-            MapController.Instance().GetGridCellArray()[(int)_soldierXIndex, (int)_soldierYIndex].GridCellType = GridCellTypes.Empty;
-            MapController.Instance().GetGridCellArray()[(int)_moveFinishXIndex, (int)_moveFinishYIndex].GridCellType = GridCellTypes.Soldier;
-            if (_i < MapController.Instance().GetExamplePath().Count)
+            if (_soldierXIndex != null && _soldierYIndex != null && _moveFinishXIndex != null && _moveFinishYIndex != null)
             {
-                
-                _soldierXIndex = _moveFinishXIndex;
-                _soldierYIndex = _moveFinishYIndex;
-                _moveFinishXIndex = exPath[_i].XIndex;
-                _moveFinishYIndex = exPath[_i].YIndex;
-                _soldierSelected = true;
-                _i++;
-            }
+                MapController.Instance().GetGridCellArray()[(int) _soldierXIndex, (int) _soldierYIndex].GridCellType = GridCellTypes.Empty;
+                MapController.Instance().GetGridCellArray()[(int) _moveFinishXIndex, (int) _moveFinishYIndex].GridCellType = GridCellTypes.Soldier;
+                if (_i < _exPath.Count)
+                {
+                    _soldierXIndex = _moveFinishXIndex;
+                    _soldierYIndex = _moveFinishYIndex;
+                    _moveFinishXIndex = _exPath[_i].XIndex;
+                    _moveFinishYIndex = _exPath[_i].YIndex;
 
-            else if (_i == MapController.Instance().GetExamplePath().Count)
-            {
-                _soldierXIndex = _moveFinishXIndex;
-                _soldierYIndex = _moveFinishYIndex;
-                _i = 2;
-            }
+                    _i++;
+                }
 
+                else if (_i == _exPath.Count)
+                {
+                    _soldierXIndex = _moveFinishXIndex;
+                    _soldierYIndex = _moveFinishYIndex;
+                    _i = 2;
+                    _hasPath = false;
+                }
+            }
+        }
+
+        public List<GridCellModel> GetSoldierPath()
+        {
+            return _exPath;
+        }
+
+        public void SetSoldierPath(List<GridCellModel> value)
+        {
+            
+            _exPath = value;
+        }
+
+        public bool GetSoldierHasPath()
+        {
+            return _hasPath;
+        }
+
+        public void SetSoldierHasPath(bool value)
+        {
+            _hasPath = value;
         }
 
         public bool GetSoldierMoving()

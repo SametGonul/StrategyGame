@@ -4,6 +4,10 @@ using UnityEngine.Timeline;
 
 namespace Assets.Scripts.View
 {
+    /// <summary>
+    /// Main game manager class
+    /// In the start of this function map controller is called.
+    /// </summary>
     public class GameManager : MonoBehaviour
     {
 
@@ -14,9 +18,5 @@ namespace Assets.Scripts.View
             MapController.Instance();
         }
 
-        // Update is called once per frame
-        void Update () {
-		
-        }
     }
 }

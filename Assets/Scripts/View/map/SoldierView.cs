@@ -7,6 +7,10 @@ using UnityEngine;
 
 namespace Assets.Scripts.View.map
 {
+    /// <summary>
+    /// Soldier view class,specific for all soldiers.
+    /// Every soldier has their own controller.
+    /// </summary>
     public class SoldierView : MonoBehaviour {
 
         // Use this for initialization

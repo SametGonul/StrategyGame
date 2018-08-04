@@ -6,10 +6,16 @@ using UnityEngine;
 
 namespace Assets.Scripts.Controller.Map
 {
+    /// <summary>
+    /// This class for grid on the map.
+    /// </summary>
     public class GridController {
 
         private static GridController _instance = null;
-        private GridModel[,] GridCellArray = new GridModel[Config.VerticalGridNumber,Config.HorizontalGridNumber];
+
+        private readonly GridCellModel[,] _gridCellCellArray = new GridCellModel[Config.VerticalGridNumber,Config.HorizontalGridNumber];
+
+        // In the constructor create grid which includes grid cells.(static 28x24)
         private GridController()
         {
             FillCell();
@@ -20,35 +26,26 @@ namespace Assets.Scripts.Controller.Map
             return _instance ?? (_instance = new GridController());
         }
 
-
+        /// <summary>
+        /// This fills cells to grid.
+        /// </summary>
         private void FillCell()
         {
             for (int i = 0; (i) < Config.VerticalGridNumber; i++)
             {
                 for (int j = 0; j < Config.HorizontalGridNumber; j++)
                 {
-                    GridModel GridCell = new GridModel();
-                    GridCellArray[i, j] = GridCell;
-                    GridCellArray[i, j].XIndex = i;
-                    GridCellArray[i, j].YIndex = j;
+                    GridCellModel gridCellCell = new GridCellModel();
+                    _gridCellCellArray[i, j] = gridCellCell;
+                    _gridCellCellArray[i, j].XIndex = i;
+                    _gridCellCellArray[i, j].YIndex = j;
                 }             
             }       
         }
 
-        public GridModel[,] GetGridCellArray()
+        public GridCellModel[,] GetGridCellArray()
         {
-            return GridCellArray;
-        }
-
-        public void CheckEnums()
-        {
-            for (int i = 0; i < Config.VerticalGridNumber; i++)
-            {
-                for (int j = 0; j < Config.HorizontalGridNumber; j++)
-                {
-                    Debug.Log(GridCellArray[i,j].GridCellType);
-                }
-            }
+            return _gridCellCellArray;
         }
     }
 }

@@ -1,5 +1,8 @@
 ﻿namespace Assets.Scripts.Model
 {
+    /// <summary>
+    /// Cell model which is used in A* algorithm for every grid cell
+    /// </summary>
     public class CellModelForAStar : ICellModelForAStar {
         public int ParentXIndex { get; set; }
         public int ParentYIndex { get; set; }

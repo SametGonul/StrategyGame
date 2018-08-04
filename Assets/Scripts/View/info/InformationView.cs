@@ -10,16 +10,7 @@ namespace Assets.Scripts.View.info
         public Image BuildingImage;
         public Button SoldierCreateButton;
 
-        // Use this for initialization
-        void Start () {
-		
-        }
-	
-        // Update is called once per frame
-        void Update () {
-		
-        }
-
+        //this function is called when create soldier button is clicked on information view. 
         public void CreateSoldierOnMap()
         {
             InfoController.Instance().CreateSoldierOnMap();

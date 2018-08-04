@@ -10,24 +10,24 @@ namespace Assets.Scripts.Controller.Scroll
     public class ScrollBuildingController
     {
 
-        public ScrollBuildingView _scrollBuildingView; 
+        public ScrollBuildingView ScrollBuildingView; 
         // this constructor link between view and viewmodel. It links building and its controller
         public ScrollBuildingController(ScrollBuildingView building)
         {
-            _scrollBuildingView = building;
+            ScrollBuildingView = building;
             building.ScrollBuildingController = this;
             //Debug.Log(this);
         }
 
         // this function makes objects pooling, when object goes down or up from the screen, it is relocated to new coordinates.
         public void RelocateBuilding () {
-            if (_scrollBuildingView.transform.localPosition.y < Config.ScrollviewMinYValue)
+            if (ScrollBuildingView.transform.localPosition.y < Config.ScrollviewMinYValue)
             {
-                _scrollBuildingView.transform.localPosition = new Vector2(_scrollBuildingView.transform.localPosition.x, _scrollBuildingView.transform.localPosition.y + Config.ScrollviewHeight);
+                ScrollBuildingView.transform.localPosition = new Vector2(ScrollBuildingView.transform.localPosition.x, ScrollBuildingView.transform.localPosition.y + Config.ScrollviewHeight);
             }
-            else if (_scrollBuildingView.transform.localPosition.y > Config.ScrollviewMaxYValue)
+            else if (ScrollBuildingView.transform.localPosition.y > Config.ScrollviewMaxYValue)
             {
-                _scrollBuildingView.transform.localPosition = new Vector2(_scrollBuildingView.transform.localPosition.x, _scrollBuildingView.transform.localPosition.y - Config.ScrollviewHeight);
+                ScrollBuildingView.transform.localPosition = new Vector2(ScrollBuildingView.transform.localPosition.x, ScrollBuildingView.transform.localPosition.y - Config.ScrollviewHeight);
             }
         }
 

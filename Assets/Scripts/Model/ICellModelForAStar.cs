@@ -2,6 +2,9 @@
 
 namespace Assets.Scripts.Model
 {
+    /// <summary>
+    /// Grid Cell Model interface class
+    /// </summary>
     public interface ICellModelForAStar
     {
         int ParentXIndex { get; set; }

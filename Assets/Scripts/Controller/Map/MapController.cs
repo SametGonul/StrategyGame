@@ -10,7 +10,6 @@ using Assets.Scripts.StrategyGame.conf;
 using Assets.Scripts.View.map;
 using Unity.Jobs;
 using UnityEditor;
-using UnityEditor.Experimental.UIElements.GraphView;
 using UnityEngine;
 using UnityEngine.Experimental.UIElements;
 using Image = UnityEngine.UI.Image;
@@ -256,7 +255,7 @@ namespace Assets.Scripts.Controller.Map
         }
 
         // On drag finish it checks if soldier is in building area.
-        // Set the cell colors on grid according to collision.
+        // Set the cell colors on grid according to collision.  
         private void CheckSoldierInBuildingArea(GridCellTypes gridCellType)
         {
             var indexSetterWithBuildingType = gridCellType == GridCellTypes.Barrack ? 1 : 0;
@@ -500,6 +499,10 @@ namespace Assets.Scripts.Controller.Map
                             soldier.GetComponent<SoldierView>().GetSoldierController().SetSoldierYIndex(clickedYIndex);
                             soldier.GetComponent<SoldierView>().GetSoldierController().SetSoldierSelected(true);
                         }
+                        else
+                        {
+                            soldier.GetComponent<SoldierView>().GetSoldierController().SetSoldierSelected(false);
+                        }
                     }
                     _soldierClickedChecker = true;
                 }
@@ -545,8 +548,6 @@ namespace Assets.Scripts.Controller.Map
                                     }
                                 }
                             }
-
-                            soldier.GetComponent<SoldierView>().GetSoldierController().SetSoldierSelected(false);
                         }
                     }
                 }

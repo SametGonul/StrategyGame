@@ -3,7 +3,7 @@ using System.Net.Mime;
 using Assets.Scripts.Model;
 using Assets.Scripts.StrategyGame.conf;
 using Assets.Scripts.View.info;
-using UnityEditor.Build;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 using Object = UnityEngine.Object;

@@ -1,5 +1,6 @@
 ﻿using Assets.Scripts.Controller.Map;
 using Assets.Scripts.Controller.Scroll;
+using Assets.Scripts.Model;
 using UnityEngine;
 
 namespace Assets.Scripts.View.scroll
@@ -16,7 +17,7 @@ namespace Assets.Scripts.View.scroll
         //this function detects drag is started in powerplant.
         public void PowerPlantDragStart()
         {
-            ScrollController.Instance().PowerPlantEventChecker = true;
+            ScrollController.Instance().ScrollDragEventChecker.BuildingEventType = BuildingEventTypes.PowerPlant;
         }
 
         // this function called when powerplant drag is finished.
@@ -24,7 +25,7 @@ namespace Assets.Scripts.View.scroll
         {
             if(MapController.Instance().GetMouseEventChecker())
                 MapController.Instance().DragFinished();
-            ScrollController.Instance().PowerPlantEventChecker = false;
+            ScrollController.Instance().ScrollDragEventChecker.BuildingEventType = BuildingEventTypes.None;
         }
         
     }

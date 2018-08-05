@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Assets.Scripts.Model;
 using Assets.Scripts.View.scroll;
 using UnityEngine;
 using Assets.Scripts.StrategyGame.conf;
@@ -19,9 +20,13 @@ namespace Assets.Scripts.Controller.Scroll
         public bool BarrackEventChecker = false;
         public bool PowerPlantEventChecker = false;
 
+        public EventCheckModel ScrollDragEventChecker;
+   
+
         private ScrollController()
         {
             AddScrollviewBuildingControllers(); // singleton constructor, calling this function to add all building controllers
+            ScrollDragEventChecker = new EventCheckModel {BuildingEventType = BuildingEventTypes.None};
         }
 
         // creating instance

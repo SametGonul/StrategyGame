@@ -1,5 +1,6 @@
 ﻿using Assets.Scripts.Controller.Map;
 using Assets.Scripts.Controller.Scroll;
+using Assets.Scripts.Model;
 using UnityEngine;
 
 namespace Assets.Scripts.View.scroll
@@ -22,7 +23,7 @@ namespace Assets.Scripts.View.scroll
         // TO DO: this function will detect drag will be started in barrack.
         public void BarrackDragStart()
         {
-            ScrollController.Instance().BarrackEventChecker = true;
+            ScrollController.Instance().ScrollDragEventChecker.BuildingEventType = BuildingEventTypes.Barrack;
         }
 
         // TO DO: this function will detect if drag continuous on map and help to build barrack on map.
@@ -35,7 +36,7 @@ namespace Assets.Scripts.View.scroll
         {
             if (MapController.Instance().GetMouseEventChecker())
                 MapController.Instance().DragFinished();
-            ScrollController.Instance().BarrackEventChecker = false;
+            ScrollController.Instance().ScrollDragEventChecker.BuildingEventType = BuildingEventTypes.None;
         }
     }
 }

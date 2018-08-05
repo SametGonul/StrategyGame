@@ -68,10 +68,10 @@ namespace Assets.Scripts.Controller.Map
         {
             _dragEventFromScrollToMap = false;
             BuildingFactory factory = new ScrollBuildingModelFactory();
-            if (ScrollController.Instance().BarrackEventChecker)
+            if (ScrollController.Instance().ScrollDragEventChecker.BuildingEventType == BuildingEventTypes.Barrack)
             {
                 
-                ScrollController.Instance().BarrackEventChecker = false;
+                ScrollController.Instance().ScrollDragEventChecker.BuildingEventType = BuildingEventTypes.None;
                 CheckCollidedBarraksOnDragFinish();
                 CheckSoldierInBuildingArea(GridCellTypes.Barrack);
                 if (!_barrackCollisionChecker && !_soldierChecker)
@@ -92,9 +92,9 @@ namespace Assets.Scripts.Controller.Map
                 _soldierChecker = false;
             }
             
-            else if (ScrollController.Instance().PowerPlantEventChecker)
+            else if (ScrollController.Instance().ScrollDragEventChecker.BuildingEventType == BuildingEventTypes.PowerPlant)
             {        
-                ScrollController.Instance().PowerPlantEventChecker = false;
+                ScrollController.Instance().ScrollDragEventChecker.BuildingEventType = BuildingEventTypes.None;
                 CheckCollidedPowerPlantsOnDragFinish();
                 CheckSoldierInBuildingArea(GridCellTypes.PowerPlant);
                 if (!_powerPlantCollisionChecker && !_soldierChecker)
@@ -143,7 +143,7 @@ namespace Assets.Scripts.Controller.Map
         // This function is called enter event of mouse on map.
         public void MouseOnMap()
         {
-            if(ScrollController.Instance().BarrackEventChecker || ScrollController.Instance().PowerPlantEventChecker)
+            if(ScrollController.Instance().ScrollDragEventChecker.BuildingEventType == BuildingEventTypes.Barrack || ScrollController.Instance().ScrollDragEventChecker.BuildingEventType == BuildingEventTypes.PowerPlant)
                 _dragEventFromScrollToMap = true;
         }
 
@@ -184,22 +184,22 @@ namespace Assets.Scripts.Controller.Map
                 {
                     if (_activeCellPositionX != null && _activeCellPositionY != null)
                     {
-                        if(ScrollController.Instance().BarrackEventChecker)
+                        if(ScrollController.Instance().ScrollDragEventChecker.BuildingEventType == BuildingEventTypes.Barrack)
                             ColorTheBarrackOnMap((int)_activeCellPositionX, (int)_activeCellPositionY, Color.green);
-                        else if (ScrollController.Instance().PowerPlantEventChecker)
+                        else if (ScrollController.Instance().ScrollDragEventChecker.BuildingEventType == BuildingEventTypes.PowerPlant)
                             ColorThePowerPlantOnMap((int) _activeCellPositionX, (int) _activeCellPositionY, Color.green);
                     }
                     
                     _activeCellPositionX = roundedXIndex;
                     _activeCellPositionY = roundedYIndex;
 
-                    if (ScrollController.Instance().BarrackEventChecker)
+                    if (ScrollController.Instance().ScrollDragEventChecker.BuildingEventType == BuildingEventTypes.Barrack)
                     {
                         CheckCollidedBuildingCells();
                         if (_activeCellPositionX != null && _activeCellPositionY != null)
                             ColorTheBarrackOnMap((int) _activeCellPositionX, (int) _activeCellPositionY, Color.blue);
                     }                        
-                    else if (ScrollController.Instance().PowerPlantEventChecker)
+                    else if (ScrollController.Instance().ScrollDragEventChecker.BuildingEventType == BuildingEventTypes.PowerPlant)
                     {
                         CheckCollidedBuildingCells();
                         if (_activeCellPositionX != null && _activeCellPositionY != null)

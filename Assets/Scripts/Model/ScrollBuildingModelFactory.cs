@@ -4,7 +4,7 @@ namespace Assets.Scripts.Model
 {
     public abstract class BuildingFactory
     {
-        public abstract IScrollBuildingModel CreateScrollBuildingModel(string buildingName);
+        public abstract IScrollBuildingModel CreateScrollBuildingModel(BuildingEventTypes eventType);
     }
     /// <summary> it is abstract building factory class </summary> 
     public class ScrollBuildingModelFactory : BuildingFactory
@@ -12,13 +12,13 @@ namespace Assets.Scripts.Model
 
         // factory function,according to name it creates model. 
 
-        public override IScrollBuildingModel CreateScrollBuildingModel(string buildingName)
+        public override IScrollBuildingModel CreateScrollBuildingModel(BuildingEventTypes eventType)
         {
-            switch (buildingName)
+            switch (eventType)
             {
-                case Config.BarrackName:
+                case BuildingEventTypes.Barrack:
                     return new ScrollBarrackModel();
-                case Config.PowerPlantName:
+                case BuildingEventTypes.PowerPlant:
                     return new ScrollPowerPlantModel();
                 default:
                     return null;

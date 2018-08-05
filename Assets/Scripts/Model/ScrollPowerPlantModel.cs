@@ -27,6 +27,18 @@ namespace Assets.Scripts.Model
         public int XIndex { get; set; }
         public int YIndex { get; set; }
         public int BuildingNumber { get; set; }
+        public bool CheckCollision(int clickedXIndex, int clickedYIndex)
+        {
+            if (this.XIndex - clickedXIndex >= 0 &&
+                this.XIndex - clickedXIndex <= 1 && 
+                this.YIndex - clickedYIndex >= -1 &&
+                this.YIndex - clickedYIndex <= 1)
+            {
+                return true;
+            }
+
+            return false;
+        }
 
         public Vector2 LocationCenter { get; set; }
     }

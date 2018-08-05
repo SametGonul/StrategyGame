@@ -35,13 +35,10 @@ namespace Assets.Scripts.Controller.Map
         private bool _barrackCollisionChecker = false;
         private bool _powerPlantCollisionChecker = false;
         private bool _soldierChecker = false;
-        
-        // counting barracks and powerplants for their name.
-        private int _barrackCounter = 1;
-        private int _powerPlantCounter = 1;
 
-        private readonly List<IScrollBuildingModel> _barracks = new List<IScrollBuildingModel>();
-        private readonly List<IScrollBuildingModel> _powerPlants = new List<IScrollBuildingModel>();
+
+        readonly Dictionary<BuildingEventTypes,List<IScrollBuildingModel>> _buildingsList = new Dictionary<BuildingEventTypes, List<IScrollBuildingModel>>();
+
         private readonly List<GameObject> _soldiersList = new List<GameObject>();
         private bool _soldierClickedChecker = false;
 
@@ -53,6 +50,8 @@ namespace Assets.Scripts.Controller.Map
             MapView exMapView = Object.FindObjectOfType<MapView>();
             _gridCellGameObjectArray = exMapView.LocateGameObjectsOnGridCells();
             _gridCellCellArray = GridController.Instance().GetGridCellArray();
+            _buildingsList.Add(BuildingEventTypes.Barrack,new List<IScrollBuildingModel>());
+            _buildingsList.Add(BuildingEventTypes.PowerPlant, new List<IScrollBuildingModel>());
         }
 
         public static MapController Instance()
@@ -67,7 +66,6 @@ namespace Assets.Scripts.Controller.Map
         public void DragFinished()
         {
             _dragEventFromScrollToMap = false;
-            BuildingFactory factory = new ScrollBuildingModelFactory();
             if (ScrollController.Instance().ScrollDragEventChecker.BuildingEventType == BuildingEventTypes.Barrack)
             {
                 
@@ -76,13 +74,7 @@ namespace Assets.Scripts.Controller.Map
                 CheckSoldierInBuildingArea(GridCellTypes.Barrack);
                 if (!_barrackCollisionChecker && !_soldierChecker)
                 {
-                    IScrollBuildingModel barrack = factory.CreateScrollBuildingModel(Config.BarrackName);
-                    if (_activeCellPositionX != null) barrack.XIndex = (int) _activeCellPositionX;
-                    if (_activeCellPositionY != null) barrack.YIndex = (int)_activeCellPositionY;
-                    barrack.BuildingNumber = _barrackCounter;
-                    _barrackCounter++;
-                    _barracks.Add(barrack);
-                                  
+                    AddBuildingToLists(BuildingEventTypes.Barrack);
                 }
                 else
                 {
@@ -99,12 +91,7 @@ namespace Assets.Scripts.Controller.Map
                 CheckSoldierInBuildingArea(GridCellTypes.PowerPlant);
                 if (!_powerPlantCollisionChecker && !_soldierChecker)
                 {
-                    IScrollBuildingModel powerPlant = factory.CreateScrollBuildingModel(Config.PowerPlantName);
-                    if (_activeCellPositionX != null) powerPlant.XIndex = (int)_activeCellPositionX;
-                    if (_activeCellPositionY != null) powerPlant.YIndex = (int)_activeCellPositionY;
-                    powerPlant.BuildingNumber = _powerPlantCounter;
-                    _powerPlantCounter++;
-                    _powerPlants.Add(powerPlant);
+                    AddBuildingToLists(BuildingEventTypes.PowerPlant);
                     CheckSoldierInBuildingArea(GridCellTypes.PowerPlant);
                 }
                 else
@@ -116,6 +103,17 @@ namespace Assets.Scripts.Controller.Map
             PreventCollision();
             _activeCellPositionY = null;
             _activeCellPositionX = null;     
+        }
+
+        private void AddBuildingToLists(BuildingEventTypes buildingDragEventType)
+        {
+            BuildingFactory factory = new ScrollBuildingModelFactory();
+            IScrollBuildingModel newBuilding = null;
+            newBuilding = factory.CreateScrollBuildingModel(buildingDragEventType);
+            if (_activeCellPositionX != null) newBuilding.XIndex = (int)_activeCellPositionX;
+            if (_activeCellPositionY != null) newBuilding.YIndex = (int)_activeCellPositionY;
+            newBuilding.BuildingNumber = _buildingsList[buildingDragEventType].Count + 1; 
+            _buildingsList[buildingDragEventType].Add(newBuilding);
         }
 
         // This function called when drag finished, when new building dragged on building on map.
@@ -462,29 +460,19 @@ namespace Assets.Scripts.Controller.Map
         // when clicked left on soldier, it is selected, after this when click empty grid cell right click, soldier starts to move.
         private void CheckClickIsGameObject(int clickedXIndex, int clickedYIndex,int mouseClickType)
         {
-            
-            for (int i = 0; i < _barracks.Count; i++)
+            BuildingEventType eventType = new BuildingEventType();
+            foreach (BuildingEventTypes enumType in eventType.GetValidEventTypes())
             {
-                if (_barracks[i].XIndex - clickedXIndex >= -1 && _barracks[i].XIndex - clickedXIndex <= 1)
+                for (int i = 0; i < _buildingsList[enumType].Count; i++)
                 {
-                    if (_barracks[i].YIndex - clickedYIndex >= -1 && _barracks[i].YIndex - clickedYIndex <= 1)
+                    if (_buildingsList[enumType][i].CheckCollision(clickedXIndex, clickedYIndex))
                     {
-                        InfoController.Instance().ShowInfoClickedObject(_barracks[i]);
+                        InfoController.Instance().ShowInfoClickedObject(_buildingsList[enumType][i]);
                         break;
                     }
                 }
             }
-            for (int i = 0; i < _powerPlants.Count; i++)
-            {
-                if (_powerPlants[i].XIndex - clickedXIndex >= 0 && _powerPlants[i].XIndex - clickedXIndex <= 1)
-                {
-                    if (_powerPlants[i].YIndex - clickedYIndex >= -1 && _powerPlants[i].YIndex - clickedYIndex <= 1)
-                    {
-                        InfoController.Instance().ShowInfoClickedObject(_powerPlants[i]);
-                        break;
-                    }          
-                }
-            }
+
 
             if (mouseClickType == 0)
             {

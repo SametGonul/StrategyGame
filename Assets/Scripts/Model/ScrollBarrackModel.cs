@@ -1,4 +1,5 @@
-﻿using Assets.Scripts.StrategyGame.conf;
+﻿using System.Runtime.Remoting.Messaging;
+using Assets.Scripts.StrategyGame.conf;
 using UnityEngine;
 
 namespace Assets.Scripts.Model
@@ -9,7 +10,7 @@ namespace Assets.Scripts.Model
     /// </summary>
     public class ScrollBarrackModel : IScrollBuildingModel
     {
-        
+
         public string Name
         {
             get { return Config.BarrackName; }
@@ -28,6 +29,19 @@ namespace Assets.Scripts.Model
         public int XIndex { get; set; }
         public int YIndex { get; set; }
         public int BuildingNumber { get; set; }
+        public bool CheckCollision(int clickedXIndex, int clickedYIndex)
+        {
+
+            if (this.XIndex - clickedXIndex >= -1 &&
+                this.XIndex - clickedXIndex <= 1 &&
+                this.YIndex - clickedYIndex >= -1 &&
+                this.YIndex - clickedYIndex <= 1)
+            {
+                return true;
+            }
+
+            return false;
+        }
     }
 
 }

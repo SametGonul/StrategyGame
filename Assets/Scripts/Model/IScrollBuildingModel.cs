@@ -15,6 +15,9 @@ namespace Assets.Scripts.Model
         int XIndex { get; set; }
         int YIndex { get; set; }
         int BuildingNumber { get; set; }
+
+        // check collision 
+        bool CheckCollision(int clickedXIndex,int clickedYIndex);
     }
 }
 

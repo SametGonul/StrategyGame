@@ -32,8 +32,7 @@ namespace Assets.Scripts.Controller.Map
 
         private readonly GridCellModel[,] _gridCellCellArray;
 
-        private bool _barrackCollisionChecker = false;
-        private bool _powerPlantCollisionChecker = false;
+
         private bool _soldierChecker = false;
 
 
@@ -66,40 +65,13 @@ namespace Assets.Scripts.Controller.Map
         public void DragFinished()
         {
             _dragEventFromScrollToMap = false;
-            if (ScrollController.Instance().ScrollDragEventChecker.BuildingEventType == BuildingEventTypes.Barrack)
-            {
-                
-                ScrollController.Instance().ScrollDragEventChecker.BuildingEventType = BuildingEventTypes.None;
-                CheckCollidedBarraksOnDragFinish();
-                CheckSoldierInBuildingArea(GridCellTypes.Barrack);
-                if (!_barrackCollisionChecker && !_soldierChecker)
-                {
-                    AddBuildingToLists(BuildingEventTypes.Barrack);
-                }
-                else
-                {
-                    _barrackCollisionChecker = false;
-                }
-
-                _soldierChecker = false;
-            }
             
-            else if (ScrollController.Instance().ScrollDragEventChecker.BuildingEventType == BuildingEventTypes.PowerPlant)
-            {        
-                ScrollController.Instance().ScrollDragEventChecker.BuildingEventType = BuildingEventTypes.None;
-                CheckCollidedPowerPlantsOnDragFinish();
-                CheckSoldierInBuildingArea(GridCellTypes.PowerPlant);
-                if (!_powerPlantCollisionChecker && !_soldierChecker)
-                {
-                    AddBuildingToLists(BuildingEventTypes.PowerPlant);
-                    CheckSoldierInBuildingArea(GridCellTypes.PowerPlant);
-                }
-                else
-                {
-                    _powerPlantCollisionChecker = false;
-                }
-                _soldierChecker = false;
-            }
+            CheckSoldierInBuildingArea(ScrollController.Instance().ScrollDragEventChecker.BuildingEventType);
+            CheckCollidedBuildingOnDragFinish(ScrollController.Instance().ScrollDragEventChecker.BuildingEventType);
+            
+
+            ScrollController.Instance().ScrollDragEventChecker.BuildingEventType = BuildingEventTypes.None;
+            _soldierChecker = false;
             PreventCollision();
             _activeCellPositionY = null;
             _activeCellPositionX = null;     
@@ -220,7 +192,8 @@ namespace Assets.Scripts.Controller.Map
                     {
                         if(_gridCellCellArray[i,j].GridCellType == GridCellTypes.Empty)
                             _gridCellGameObjectArray[i,j].GetComponent<Image>().color = color;
-                        else if (_gridCellCellArray[i,j].GridCellType == GridCellTypes.Barrack || _gridCellCellArray[i,j].GridCellType == GridCellTypes.PowerPlant)
+                        else if (_gridCellCellArray[i,j].GridCellType == GridCellTypes.Barrack ||
+                                 _gridCellCellArray[i,j].GridCellType == GridCellTypes.PowerPlant)
                         {
                             _gridCellGameObjectArray[i, j].GetComponent<Image>().color = Color.red;
                         }
@@ -254,9 +227,22 @@ namespace Assets.Scripts.Controller.Map
 
         // On drag finish it checks if soldier is in building area.
         // Set the cell colors on grid according to collision.  
-        private void CheckSoldierInBuildingArea(GridCellTypes gridCellType)
+        private void CheckSoldierInBuildingArea(BuildingEventTypes eventType)
         {
-            var indexSetterWithBuildingType = gridCellType == GridCellTypes.Barrack ? 1 : 0;
+            int indexSetterWithBuildingType = 0;
+            switch (eventType)
+            {
+                case BuildingEventTypes.Barrack:
+                    indexSetterWithBuildingType = 1;
+                    break;
+                case BuildingEventTypes.PowerPlant:
+                    indexSetterWithBuildingType = 0;
+                    break;
+                case BuildingEventTypes.None:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException("eventType", eventType, null);
+            }
 
             if (_activeCellPositionX != null && _activeCellPositionY != null)
             {
@@ -302,7 +288,16 @@ namespace Assets.Scripts.Controller.Map
                         for (int j = (int) _activeCellPositionY - 1; j <= (int) _activeCellPositionY + 1; j++)
                         {
                             if (_gridCellCellArray[i, j].GridCellType == GridCellTypes.Empty)
-                                _gridCellCellArray[i, j].GridCellType = gridCellType;
+                            {
+                                if (indexSetterWithBuildingType == 0)
+                                {
+                                    _gridCellCellArray[i, j].GridCellType = GridCellTypes.PowerPlant;
+                                }
+                                else if (indexSetterWithBuildingType == 1)
+                                {
+                                    _gridCellCellArray[i, j].GridCellType = GridCellTypes.Barrack;
+                                }
+                            }
                         }
                     }
                 }
@@ -333,33 +328,44 @@ namespace Assets.Scripts.Controller.Map
 
         // On drag finish for barracks, this checks it crashed with other buildings
         // set the color of cells after collision on drag finish
-        private void CheckCollidedBarraksOnDragFinish()
+        private void CheckCollidedBuildingOnDragFinish(BuildingEventTypes eventType)
         {
-            
-            for (int i = (int) _activeCellPositionX - 1; i <= (int) _activeCellPositionX + 1; i++)
+            BuildingEventTypes buildingCollisionChecker = BuildingEventTypes.None;
+            int indexChecker = 0;
+            Color gridCellColor = Color.yellow;
+
+            if (eventType == BuildingEventTypes.Barrack)
+            {
+                indexChecker = 1;
+                gridCellColor = Color.blue;           
+            }
+
+            for (int i = (int) _activeCellPositionX - 1; i <= (int) _activeCellPositionX + indexChecker; i++)
             {
                 for (int j = (int) _activeCellPositionY - 1; j <= (int) _activeCellPositionY + 1; j++)
                 {
-                    if (_gridCellCellArray[i, j].GridCellType == GridCellTypes.Barrack &&
-                        _gridCellGameObjectArray[i, j].gameObject.GetComponent<Image>().color == Color.red)
+                    if (_gridCellGameObjectArray[i, j].gameObject.GetComponent<Image>().color == Color.red)
                     {
-                        _barrackCollisionChecker = true;
-                    }
-                    else if (_gridCellCellArray[i, j].GridCellType == GridCellTypes.PowerPlant &&
-                             _gridCellGameObjectArray[i, j].gameObject.GetComponent<Image>().color == Color.red)
-                    {
-                        _barrackCollisionChecker = true;
+                        if (indexChecker == 0)
+                        {
+                            buildingCollisionChecker = BuildingEventTypes.Barrack;
+                        }
+                        else
+                        {
+                            buildingCollisionChecker = BuildingEventTypes.PowerPlant;
+                        }
+
                     }
                 }
             }
 
-            if (_barrackCollisionChecker)
+            if (buildingCollisionChecker != BuildingEventTypes.None)
             {
-                for (int i = (int) _activeCellPositionX - 1; i <= (int) _activeCellPositionX + 1; i++)
+                for (int i = (int) _activeCellPositionX - 1; i <= (int) _activeCellPositionX + indexChecker; i++)
                 {
                     for (int j = (int) _activeCellPositionY - 1; j <= (int) _activeCellPositionY + 1; j++)
                     {
-                        if (_gridCellGameObjectArray[i, j].gameObject.GetComponent<Image>().color == Color.blue)
+                        if (_gridCellGameObjectArray[i, j].gameObject.GetComponent<Image>().color == gridCellColor)
                         {
                             _gridCellGameObjectArray[i, j].gameObject.GetComponent<Image>().color = Color.green;
                             _gridCellCellArray[i, j].GridCellType = GridCellTypes.Empty;
@@ -380,59 +386,14 @@ namespace Assets.Scripts.Controller.Map
                     }
                 }
             }
-
-        }
-
-        // On drag finish for powerplants, this checks it crashed with other buildings
-        // set the color of cells after collision on drag finish
-        private void CheckCollidedPowerPlantsOnDragFinish()
-        {
-            
-            for (int i = (int)_activeCellPositionX - 1; i <= (int)_activeCellPositionX ; i++)
+            if (buildingCollisionChecker == BuildingEventTypes.None && !_soldierChecker)
             {
-                for (int j = (int)_activeCellPositionY - 1; j <= (int)_activeCellPositionY + 1; j++)
-                {
-                    if (_gridCellCellArray[i, j].GridCellType == GridCellTypes.PowerPlant &&
-                        _gridCellGameObjectArray[i, j].gameObject.GetComponent<Image>().color == Color.red)
-                    {
-                        _powerPlantCollisionChecker = true;
-                    }
-                    else if (_gridCellCellArray[i, j].GridCellType == GridCellTypes.Barrack &&
-                             _gridCellGameObjectArray[i, j].gameObject.GetComponent<Image>().color == Color.red)
-                    {
-                        _powerPlantCollisionChecker = true;
-                    }
-                }
+                AddBuildingToLists(ScrollController.Instance().ScrollDragEventChecker.BuildingEventType);
             }
-
-            if (_powerPlantCollisionChecker)
+            else
             {
-                for (int i = (int)_activeCellPositionX - 1; i <= (int)_activeCellPositionX ; i++)
-                {
-                    for (int j = (int)_activeCellPositionY - 1; j <= (int)_activeCellPositionY + 1; j++)
-                    {
-                        if (_gridCellGameObjectArray[i, j].gameObject.GetComponent<Image>().color == Color.yellow)
-                        {
-                            _gridCellGameObjectArray[i, j].gameObject.GetComponent<Image>().color = Color.green;
-                            _gridCellCellArray[i, j].GridCellType = GridCellTypes.Empty;
-                        }
-                    }
-                }
-                for (int i = (int)_activeCellPositionX - 1; i <= (int)_activeCellPositionX ; i++)
-                {
-                    for (int j = (int)_activeCellPositionY - 1; j <= (int)_activeCellPositionY + 1; j++)
-                    {
-                        if (_gridCellGameObjectArray[i, j].gameObject.GetComponent<Image>().color == Color.red)
-                        {
-                            if (_gridCellCellArray[i, j].GridCellType == GridCellTypes.Barrack)
-                                _gridCellGameObjectArray[i, j].gameObject.GetComponent<Image>().color = Color.blue;
-                            else if (_gridCellCellArray[i, j].GridCellType == GridCellTypes.PowerPlant)
-                                _gridCellGameObjectArray[i, j].gameObject.GetComponent<Image>().color = Color.yellow;
-                        }
-                    }
-                }
+                buildingCollisionChecker = BuildingEventTypes.None;
             }
-
         }
 
         // find gridcell xIndex,yIndex and checks clicked on gameobject or not.

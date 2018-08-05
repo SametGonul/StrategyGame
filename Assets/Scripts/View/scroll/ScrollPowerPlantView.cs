@@ -1,13 +1,8 @@
-﻿namespace Assets.Scripts.View.scroll
-{
+﻿using UnityEngine;
 
-    /// <summary>
-    /// View class for powerplants.
-    /// </summary>
+namespace Assets.Scripts.View.scroll
+{
     public class ScrollPowerPlantView : ScrollBuildingView
     {
-
     }
-
-
 }

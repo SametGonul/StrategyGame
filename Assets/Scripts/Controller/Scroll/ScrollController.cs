@@ -65,6 +65,7 @@ namespace Assets.Scripts.Controller.Scroll
             {
                 ScrollBuildingController scrollBuildingController = new ScrollBuildingController(buildingList.ElementAt(i));
                 _buildingControllers.Add(scrollBuildingController);
+                
             }
         }
     }

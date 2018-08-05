@@ -3,7 +3,9 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 namespace Assets.Scripts.View.map
-{
+{   /// <summary>
+    /// This class handles events on map. 
+    /// </summary>
     public class MapEventHandler : MonoBehaviour {
 
         private int _mouseClickType;

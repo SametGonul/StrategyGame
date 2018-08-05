@@ -10,7 +10,6 @@ namespace Assets.Scripts.View
     /// </summary>
     public class GameManager : MonoBehaviour
     {
-
         public GameObject Prefab;
         // Use this for initialization
         void Start ()

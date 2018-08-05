@@ -15,7 +15,7 @@ namespace Assets.Scripts.View.scroll
         // this parent has viewmodel and getter and setter methods.
         public ScrollBuildingController ScrollBuildingController { get; set; } 
 
-        GameObject IScrollBuildingView.buildingObject
+        GameObject IScrollBuildingView.BuildingObject
         {
             get
             {

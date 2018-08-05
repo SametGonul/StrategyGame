@@ -6,6 +6,9 @@ using UnityEngine;
 
 namespace Assets.Scripts.View.map
 {
+    /// <summary>
+    /// This class is component of the map gameobject in unity.
+    /// </summary>
     public class MapView : MonoBehaviour
     {
 

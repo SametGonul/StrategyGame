@@ -2,7 +2,7 @@
 
 namespace Assets.Scripts.Model
 {
-    public class EventCheckModel : IEventModel {
+    public class EventCheckModel {
 
         public BuildingEventTypes BuildingEventType { get; set; }
     }

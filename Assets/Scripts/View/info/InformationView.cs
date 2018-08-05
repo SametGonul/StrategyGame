@@ -4,6 +4,9 @@ using UnityEngine.UI;
 
 namespace Assets.Scripts.View.info
 {
+    /// <summary>
+    /// This class is component of the information in unity.
+    /// </summary>
     public class InformationView : MonoBehaviour
     {
         public Text BuildingNameText;

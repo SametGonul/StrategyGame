@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Assets.Scripts.Controller.Map;
+using Assets.Scripts.Model;
 using Assets.Scripts.StrategyGame.conf;
 using Assets.Scripts.View.map;
 using UnityEngine;
 
-namespace Assets.Scripts.Model
+namespace Assets.Scripts.Controller.Map
 {
     public class ShortestPath {
 

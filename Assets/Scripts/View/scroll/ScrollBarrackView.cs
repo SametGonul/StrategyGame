@@ -1,4 +1,6 @@
-﻿namespace Assets.Scripts.View.scroll
+﻿using UnityEngine;
+
+namespace Assets.Scripts.View.scroll
 {
     /// <summary>
     /// View class for barracks
@@ -7,6 +9,4 @@
     {
 
     }
-
 }
-

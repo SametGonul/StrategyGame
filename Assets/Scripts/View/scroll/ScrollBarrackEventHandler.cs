@@ -11,27 +11,13 @@ namespace Assets.Scripts.View.scroll
  
     public class ScrollBarrackEventHandler : MonoBehaviour {
 
-        // Use this for initialization
-        void Start () {
-		    
-        }
-	
-        // Update is called once per frame
-        void Update () {
-		
-        }
-        // TO DO: this function will detect drag will be started in barrack.
+        // this function detects start of drag from a barrack building.
         public void BarrackDragStart()
         {
             ScrollController.Instance().ScrollDragEventChecker.BuildingEventType = BuildingEventTypes.Barrack;
         }
 
-        // TO DO: this function will detect if drag continuous on map and help to build barrack on map.
-        public void BarrackDragOn()
-        {
-            //Debug.Log("Barrack dragging on.");
-        }
-
+        // when mouse drag finisihed on map, it resets the scroll drag checker.
         public void BarrackDragFinish()
         {
             if (MapController.Instance().GetMouseEventChecker())

@@ -1,5 +1,5 @@
 <h1 id="strategy-game">Strategy Game</h1>
-<p>Hello, This is Strategy Game which is made with Unity The game includess three main parts.</p>
+<p>Hello, This is Strategy Game which is made with Unity The game includes three main parts.</p>
 <ul>
 <li>Infinite scroll</li>
 <li>game map</li>

@@ -387,14 +387,14 @@ GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 1730652397585122, guid: 764491dc8bd0a8445a2f7c5de9d60cd5,
     type: 2}
-  m_PrefabInternal: {fileID: 1527617145}
+  m_PrefabInternal: {fileID: 0}
   serializedVersion: 6
   m_Component:
   - component: {fileID: 485048820}
   - component: {fileID: 485048823}
   - component: {fileID: 485048822}
-  - component: {fileID: 485048821}
   - component: {fileID: 485048825}
+  - component: {fileID: 485048821}
   - component: {fileID: 485048824}
   m_Layer: 5
   m_Name: PowerPlantDragger
@@ -408,7 +408,7 @@ RectTransform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 224091545528608552, guid: 764491dc8bd0a8445a2f7c5de9d60cd5,
     type: 2}
-  m_PrefabInternal: {fileID: 1527617145}
+  m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 485048819}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
@@ -439,7 +439,7 @@ MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 114840732457916152, guid: 764491dc8bd0a8445a2f7c5de9d60cd5,
     type: 2}
-  m_PrefabInternal: {fileID: 1527617145}
+  m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 485048819}
   m_Enabled: 1
   m_EditorHideFlags: 0
@@ -467,7 +467,7 @@ CanvasRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 222470166017185938, guid: 764491dc8bd0a8445a2f7c5de9d60cd5,
     type: 2}
-  m_PrefabInternal: {fileID: 1527617145}
+  m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 485048819}
   m_CullTransparentMesh: 0
 --- !u!114 &485048824
@@ -711,8 +711,8 @@ GameObject:
   - component: {fileID: 579409568}
   - component: {fileID: 579409571}
   - component: {fileID: 579409570}
-  - component: {fileID: 579409569}
   - component: {fileID: 579409573}
+  - component: {fileID: 579409569}
   - component: {fileID: 579409572}
   m_Layer: 5
   m_Name: PowerPlantDragger3
@@ -853,8 +853,8 @@ GameObject:
   - component: {fileID: 611768634}
   - component: {fileID: 611768637}
   - component: {fileID: 611768636}
-  - component: {fileID: 611768635}
   - component: {fileID: 611768639}
+  - component: {fileID: 611768635}
   - component: {fileID: 611768638}
   m_Layer: 5
   m_Name: PowerPlantDragger4
@@ -995,8 +995,8 @@ GameObject:
   - component: {fileID: 626597804}
   - component: {fileID: 626597807}
   - component: {fileID: 626597806}
-  - component: {fileID: 626597805}
   - component: {fileID: 626597809}
+  - component: {fileID: 626597805}
   - component: {fileID: 626597808}
   m_Layer: 5
   m_Name: PowerPlantDragger5
@@ -1344,8 +1344,8 @@ GameObject:
   - component: {fileID: 933438251}
   - component: {fileID: 933438254}
   - component: {fileID: 933438253}
-  - component: {fileID: 933438252}
   - component: {fileID: 933438255}
+  - component: {fileID: 933438252}
   - component: {fileID: 933438256}
   m_Layer: 5
   m_Name: BarrackDragger2
@@ -1503,8 +1503,8 @@ GameObject:
   - component: {fileID: 998754922}
   - component: {fileID: 998754925}
   - component: {fileID: 998754924}
-  - component: {fileID: 998754923}
   - component: {fileID: 998754926}
+  - component: {fileID: 998754923}
   - component: {fileID: 998754927}
   m_Layer: 5
   m_Name: BarrackDragger5
@@ -1663,8 +1663,8 @@ GameObject:
   - component: {fileID: 1073537786}
   - component: {fileID: 1073537789}
   - component: {fileID: 1073537788}
-  - component: {fileID: 1073537787}
   - component: {fileID: 1073537790}
+  - component: {fileID: 1073537787}
   - component: {fileID: 1073537791}
   m_Layer: 5
   m_Name: BarrackDragger
@@ -1695,8 +1695,7 @@ RectTransform:
 --- !u!114 &1073537787
 MonoBehaviour:
   m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 114224715899753026, guid: 8a2cb73f42973a54c9e8ed2f62436e0a,
-    type: 2}
+  m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1073537785}
   m_Enabled: 1
@@ -1826,8 +1825,8 @@ GameObject:
   - component: {fileID: 1081993183}
   - component: {fileID: 1081993186}
   - component: {fileID: 1081993185}
-  - component: {fileID: 1081993184}
   - component: {fileID: 1081993187}
+  - component: {fileID: 1081993184}
   - component: {fileID: 1081993188}
   m_Layer: 5
   m_Name: BarrackDragger3
@@ -2108,8 +2107,8 @@ GameObject:
   - component: {fileID: 1306116858}
   - component: {fileID: 1306116861}
   - component: {fileID: 1306116860}
-  - component: {fileID: 1306116859}
   - component: {fileID: 1306116862}
+  - component: {fileID: 1306116859}
   - component: {fileID: 1306116863}
   m_Layer: 5
   m_Name: BarrackDragger4
@@ -2319,111 +2318,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1001 &1527617145
-Prefab:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 239402516}
-    m_Modifications:
-    - target: {fileID: 224091545528608552, guid: 764491dc8bd0a8445a2f7c5de9d60cd5,
-        type: 2}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 224091545528608552, guid: 764491dc8bd0a8445a2f7c5de9d60cd5,
-        type: 2}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 224091545528608552, guid: 764491dc8bd0a8445a2f7c5de9d60cd5,
-        type: 2}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 224091545528608552, guid: 764491dc8bd0a8445a2f7c5de9d60cd5,
-        type: 2}
-      propertyPath: m_LocalRotation.x
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 224091545528608552, guid: 764491dc8bd0a8445a2f7c5de9d60cd5,
-        type: 2}
-      propertyPath: m_LocalRotation.y
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 224091545528608552, guid: 764491dc8bd0a8445a2f7c5de9d60cd5,
-        type: 2}
-      propertyPath: m_LocalRotation.z
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 224091545528608552, guid: 764491dc8bd0a8445a2f7c5de9d60cd5,
-        type: 2}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 224091545528608552, guid: 764491dc8bd0a8445a2f7c5de9d60cd5,
-        type: 2}
-      propertyPath: m_RootOrder
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 224091545528608552, guid: 764491dc8bd0a8445a2f7c5de9d60cd5,
-        type: 2}
-      propertyPath: m_AnchoredPosition.x
-      value: 127
-      objectReference: {fileID: 0}
-    - target: {fileID: 224091545528608552, guid: 764491dc8bd0a8445a2f7c5de9d60cd5,
-        type: 2}
-      propertyPath: m_AnchoredPosition.y
-      value: 300
-      objectReference: {fileID: 0}
-    - target: {fileID: 224091545528608552, guid: 764491dc8bd0a8445a2f7c5de9d60cd5,
-        type: 2}
-      propertyPath: m_SizeDelta.x
-      value: 50
-      objectReference: {fileID: 0}
-    - target: {fileID: 224091545528608552, guid: 764491dc8bd0a8445a2f7c5de9d60cd5,
-        type: 2}
-      propertyPath: m_SizeDelta.y
-      value: 50
-      objectReference: {fileID: 0}
-    - target: {fileID: 224091545528608552, guid: 764491dc8bd0a8445a2f7c5de9d60cd5,
-        type: 2}
-      propertyPath: m_AnchorMin.x
-      value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 224091545528608552, guid: 764491dc8bd0a8445a2f7c5de9d60cd5,
-        type: 2}
-      propertyPath: m_AnchorMin.y
-      value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 224091545528608552, guid: 764491dc8bd0a8445a2f7c5de9d60cd5,
-        type: 2}
-      propertyPath: m_AnchorMax.x
-      value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 224091545528608552, guid: 764491dc8bd0a8445a2f7c5de9d60cd5,
-        type: 2}
-      propertyPath: m_AnchorMax.y
-      value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 224091545528608552, guid: 764491dc8bd0a8445a2f7c5de9d60cd5,
-        type: 2}
-      propertyPath: m_Pivot.x
-      value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 224091545528608552, guid: 764491dc8bd0a8445a2f7c5de9d60cd5,
-        type: 2}
-      propertyPath: m_Pivot.y
-      value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 1730652397585122, guid: 764491dc8bd0a8445a2f7c5de9d60cd5, type: 2}
-      propertyPath: m_Name
-      value: PowerPlantDragger
-      objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 0}
-  m_SourcePrefab: {fileID: 100100000, guid: 764491dc8bd0a8445a2f7c5de9d60cd5, type: 2}
-  m_IsPrefabAsset: 0
 --- !u!1 &1661800862
 GameObject:
   m_ObjectHideFlags: 0
@@ -2434,8 +2328,8 @@ GameObject:
   - component: {fileID: 1661800863}
   - component: {fileID: 1661800866}
   - component: {fileID: 1661800865}
-  - component: {fileID: 1661800864}
   - component: {fileID: 1661800868}
+  - component: {fileID: 1661800864}
   - component: {fileID: 1661800867}
   m_Layer: 5
   m_Name: PowerPlantDragger2

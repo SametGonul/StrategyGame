@@ -72,8 +72,7 @@ namespace Assets.Scripts.Controller.Map
                 }
                 openList.Remove(current);
                 closedList.Add(current);
-            }
-
+            }         
             while (_cellModelAStarArray[current.XIndex, current.YIndex].ParentXIndex != -1 &&
                    _cellModelAStarArray[current.XIndex, current.YIndex].ParentYIndex != -1)
             {

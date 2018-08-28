@@ -64,8 +64,7 @@ namespace Assets.Scripts.Controller.Map
             _dragEventFromScrollToMap = false;
             
             CheckSoldierInBuildingArea(ScrollController.Instance().ScrollDragEventChecker.BuildingEventType);
-            CheckCollidedBuildingOnDragFinish(ScrollController.Instance().ScrollDragEventChecker.BuildingEventType);
-            
+            CheckCollidedBuildingOnDragFinish(ScrollController.Instance().ScrollDragEventChecker.BuildingEventType);          
 
             ScrollController.Instance().ScrollDragEventChecker.BuildingEventType = BuildingEventTypes.None;
             _soldierChecker = false;
@@ -110,7 +109,8 @@ namespace Assets.Scripts.Controller.Map
         // This function is called enter event of mouse on map.
         public void MouseOnMap()
         {
-            if(ScrollController.Instance().ScrollDragEventChecker.BuildingEventType == BuildingEventTypes.Barrack || ScrollController.Instance().ScrollDragEventChecker.BuildingEventType == BuildingEventTypes.PowerPlant)
+            if(ScrollController.Instance().ScrollDragEventChecker.BuildingEventType == BuildingEventTypes.Barrack ||
+               ScrollController.Instance().ScrollDragEventChecker.BuildingEventType == BuildingEventTypes.PowerPlant)
                 _dragEventFromScrollToMap = true;
         }
 
@@ -134,7 +134,7 @@ namespace Assets.Scripts.Controller.Map
             {
                 float mouseRatioX = Input.mousePosition.x / Screen.width;
                 float mouseRatioY = Input.mousePosition.y / Screen.height;
-             
+
                 // 0.5values sets canvas (0,0)point to middle of the screen.
                 Vector2 mousePositionRatio = new Vector2(mouseRatioX - 0.5f,mouseRatioY - 0.5f);
                 Canvas tempCanvas = GameObject.Find("Canvas").GetComponent<Canvas>();
@@ -443,6 +443,8 @@ namespace Assets.Scripts.Controller.Map
                         {
                             soldier.GetComponent<SoldierView>().GetSoldierController().SetSoldierXIndex(clickedXIndex);
                             soldier.GetComponent<SoldierView>().GetSoldierController().SetSoldierYIndex(clickedYIndex);
+                            soldier.GetComponent<SoldierView>().SetSoldierXIndex(clickedXIndex);
+                            soldier.GetComponent<SoldierView>().SetSoldierYIndex(clickedYIndex);
                             soldier.GetComponent<SoldierView>().GetSoldierController().SetSoldierSelected(true);
                         }
                         else
@@ -474,6 +476,7 @@ namespace Assets.Scripts.Controller.Map
                                 {
                                     
                                     _soldierPath = _shortestPath.GetShortestPathWithAStarAlgorithm(soldier, (int)clickedXIndex, (int)clickedYIndex);
+                                    soldier.GetComponent<SoldierView>().SetSoldierPath(_soldierPath);
                                     soldier.GetComponent<SoldierView>().GetSoldierController().SetSoldierPath(_soldierPath);
                                     soldier.GetComponent<SoldierView>().GetSoldierController().SetSoldierHasPath(true);
 
@@ -483,15 +486,21 @@ namespace Assets.Scripts.Controller.Map
                                     }
                                     else if (_soldierPath.Count == 1)
                                     {
+                                        soldier.GetComponent<SoldierView>().SetSoldierMovingXIndex(_soldierPath[0].XIndex);
+                                        soldier.GetComponent<SoldierView>().SetSoldierMovingYIndex(_soldierPath[0].YIndex);
                                         soldier.GetComponent<SoldierView>().GetSoldierController().SetSoldierMovingXIndex(_soldierPath[0].XIndex);
                                         soldier.GetComponent<SoldierView>().GetSoldierController().SetSoldierMovingYIndex(_soldierPath[0].YIndex);
-
+                                        soldier.GetComponent<SoldierView>().StartMove();
 
                                     }
                                     else if (_soldierPath.Count > 1)
                                     {
+                                        Debug.Log("asdfas");
+                                        soldier.GetComponent<SoldierView>().SetSoldierMovingXIndex(_soldierPath[1].XIndex);
+                                        soldier.GetComponent<SoldierView>().SetSoldierMovingYIndex(_soldierPath[1].YIndex);
                                         soldier.GetComponent<SoldierView>().GetSoldierController().SetSoldierMovingXIndex(_soldierPath[1].XIndex);
                                         soldier.GetComponent<SoldierView>().GetSoldierController().SetSoldierMovingYIndex(_soldierPath[1].YIndex);
+                                        soldier.GetComponent<SoldierView>().StartMove();
                                     }
                                 }
                             }

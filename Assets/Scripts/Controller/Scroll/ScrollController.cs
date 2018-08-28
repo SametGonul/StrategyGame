@@ -28,7 +28,7 @@ namespace Assets.Scripts.Controller.Scroll
             AddScrollviewBuildingControllers(); // singleton constructor, calling this function to add all building controllers
             ScrollDragEventChecker = new EventCheckModel {BuildingEventType = BuildingEventTypes.None};
         }
-
+       
         // creating instance
         public static ScrollController Instance()
         {

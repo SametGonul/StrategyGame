@@ -1,5 +1,6 @@
 ﻿using Assets.Scripts.Model;
 using Assets.Scripts.View.map;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -37,7 +38,8 @@ namespace Assets.Scripts.Controller.Map
                 if (_soldierXIndex > _moveFinishXIndex)
                 {
                     _soldierMoving = true;
-                    _soldierView.transform.localPosition = new Vector2(_soldierView.transform.localPosition.x, _soldierView.transform.localPosition.y + 200 * Time.deltaTime);
+                    _soldierView.transform.localPosition = new Vector2(_soldierView.transform.localPosition.x, 
+                        _soldierView.transform.localPosition.y + 200 * Time.deltaTime);
                     if (_soldierView.transform.localPosition.y >
                         MapController.Instance().GetObjectList()[(int)_moveFinishXIndex, (int)_moveFinishYIndex].transform.localPosition.y)
                     {
@@ -95,7 +97,6 @@ namespace Assets.Scripts.Controller.Map
                     }
 
                 }
-
             }
         }
 
@@ -126,6 +127,11 @@ namespace Assets.Scripts.Controller.Map
             }
         }
 
+        private IEnumerator Timer()
+        {
+            yield return new WaitForSeconds(2f);
+
+        }
         public List<GridCellModel> GetSoldierPath()
         {
             return _exPath;
